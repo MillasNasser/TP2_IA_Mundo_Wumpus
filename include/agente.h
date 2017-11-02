@@ -4,7 +4,7 @@
 #define TAM_MAPA 4
 
 typedef enum{
-	V_ESQ, V_DIR, ANDAR, ATIRAR, PEGAR
+	ROTATE, ANDAR, ATIRAR, PEGAR
 }ACAO;
 
 typedef enum{
@@ -14,7 +14,7 @@ typedef enum{
 typedef struct s_Personagem{
 	int x,y;
 	int contador_movimento;
-	int direcao;
+	SENTIDO direcao;
 	char mundo_conhecido[TAM_MAPA][TAM_MAPA];
 }Personagem;
 
