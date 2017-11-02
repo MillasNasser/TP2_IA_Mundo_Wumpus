@@ -3,8 +3,9 @@
 int main(){
 	inicializa_jogador();
 	gera_mapa();
-	while(!verica_estado(player.x, player.y, RELUSENTE)){
+	while(!verifica_estado(player.x, player.y, RELUSENTE)){
 		agir(gera_acao());
+		imprime_mundo_conhecido();
 	}
 	return 0;
 }

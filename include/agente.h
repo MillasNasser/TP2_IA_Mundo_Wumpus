@@ -1,7 +1,12 @@
 #ifndef _AGENTE_H_
 #define _AGENTE_H_
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #define TAM_MAPA 4
+
+extern int verifica_estado();
 
 typedef enum{
 	V_ESQ, V_DIR, ANDAR, ATIRAR, PEGAR
