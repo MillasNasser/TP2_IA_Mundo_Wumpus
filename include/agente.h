@@ -34,6 +34,10 @@ ACAO gera_acao();
 
 void inicializa_jogador();
 
+/**
+ * Imprime na tela um pequeno mapa com todas as informações que o jogador
+ * conhece.
+ */
 void imprime_mundo_conhecido();
 
 #endif /*_AGENTE_H_*/
