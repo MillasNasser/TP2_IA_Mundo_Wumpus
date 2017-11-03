@@ -1,6 +1,9 @@
 #ifndef _AGENTE_H_
 #define _AGENTE_H_
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #define TAM_MAPA 4
 // define o pontuação caso o agente encontre o 
 // ouro.
@@ -11,6 +14,7 @@
 // Macro para obter o módulo de uma operação.
 #define MODULO(x) ((x)>=0?(x):-(x))
 
+extern int verifica_estado();
 
 typedef enum{
 	ROTATE, ANDAR, ATIRAR, PEGAR
@@ -63,6 +67,10 @@ void atirarFlecha();
  * ANDAR, ATIRAR, PEGAR) e chama a função respectiva.*/
 void agir(ACAO acao, SENTIDO sentido);
 
+/**
+ * Imprime na tela um pequeno mapa com todas as informações que o jogador
+ * conhece.
+ */
 void imprime_mundo_conhecido();
 
 #endif /*_AGENTE_H_*/
