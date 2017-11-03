@@ -28,7 +28,7 @@ OBJS = $(SRCS:$(SDIR)/%.c=$(ODIR)/%.o)
 DEPS = $(SRCS:$(SDIR)/%.c=$(ODIR)/%.d)
 
 
-all: $(OBJS)
+all: md-obj $(OBJS)
 	$(COMPILE) $(OBJS) main.c -o main.out $(LIBRARIES)
 
 
@@ -39,5 +39,7 @@ $(ODIR)/%.o: $(SDIR)/%.c
 	$(COMPILE) -c $< -o $@ $(LIBRARIES)
 
 .PHONY : clean
+md-obj:
+	mkdir -p obj
 clean:
-	-rm *.d obj/*
+	rm -rf *.d obj/*
