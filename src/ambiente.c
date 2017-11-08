@@ -29,7 +29,7 @@ void imprime_mapa(char mapa[TAM_MAPA][TAM_MAPA]){
 	char vert = ':', hor = '-';
 	int bit;
 
-	char simbolos[7] = {' ', 'B', 'P', 'F', 'W', 'R', 'J'};
+	char simbolos[7] = {' ', 'B', 'F', 'P', 'W', 'R', 'J'};
 	
 	__imprime_mapa_linha(hor, vert, x);
 	for(i=0; i<TAM_MAPA; i++){
