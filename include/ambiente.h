@@ -3,11 +3,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "agente.h"
 
-typedef enum{
+/*typedef enum{
 	BRISA=1, POCO=2, FEDOR=4, WUMPUS=8, RELUSENTE=16, JOGADOR=32
-}ESTADO;
+}ESTADO;*/
 
 char mapa[TAM_MAPA][TAM_MAPA];
 

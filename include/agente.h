@@ -16,18 +16,24 @@
 
 extern int verifica_estado();
 
+extern char mapa[TAM_MAPA][TAM_MAPA];
+
 typedef enum{
-	ROTATE, ANDAR, ATIRAR, PEGAR
+	ANDAR, ATIRAR, PEGAR
 }ACAO;
 
 typedef enum{
 	NORTE, LESTE, SUL, OESTE
 }SENTIDO;
 
+typedef enum{
+	BRISA=1, POCO=2, FEDOR=4, WUMPUS=8, RELUSENTE=16, CONHECIDO=32, VISITADO=64, JOGADOR=128
+}ESTADO;
+
 typedef struct s_Personagem{
 	int x,y;
 	int contador_movimento;
-        int pontos;
+    int pontos;
 	SENTIDO direcao;
 	char mundo_conhecido[TAM_MAPA][TAM_MAPA];
 }Personagem;

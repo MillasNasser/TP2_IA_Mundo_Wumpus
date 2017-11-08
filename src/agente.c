@@ -1,13 +1,21 @@
 #include "agente.h"
 
-void inicializa_jogador(){
-    
-    player.pontos = 0; // definindo pontuação inicial
-}			// para teste.
-
-ACAO gera_acao(){
-	return 0;
+void __preenche_mundo_conhecido(int valor){
+	int i,j;
+	for(i=0; i < TAM_MAPA; i++){
+		for(j = 0; j < TAM_MAPA; j++){
+			player.mundo_conhecido[i][j] = valor;
+		}
+	}
+	player.mundo_conhecido[3][0] = mapa[3][0];
 }
+
+void inicializa_jogador(){
+	__preenche_mundo_conhecido(0);
+	player.mundo_conhecido[3][0] = JOGADOR;
+	player.y = 3; player.x = 0;
+    player.pontos = 0; // definindo pontuação inicial
+}					   // para teste.
 
 void pontuar(int pontos){
         
@@ -145,4 +153,35 @@ void imprime_mundo_conhecido(){
 		__imprime_mundo_conhecido_linha(hor, vert, x);
 	}
 	printf("\n");
+}
+
+int marcar_estados_adj(){
+	int i, j, estado = 0;
+	int x = player.x;
+	int y = player.y;
+	if(verifica_estado(y,x,WUMPUS|POCO)){
+		return 0;
+	}
+	for(estado = 1; estado < 32; estado <<= 1){
+		if(estado == POCO|WUMPUS|RELUSENTE ||
+		   !verifica_estado(y,x,estado)) continue;
+		if(x > 0)
+			player.mundo_conhecido[y][x-1] |= estado<<1;
+		if(x < 3)
+			player.mundo_conhecido[y][x+1] |= estado*2;
+		if(y > 0)
+			player.mundo_conhecido[y-1][x] |= estado;
+		if(y < 3)
+			player.mundo_conhecido[y+1][x] |= estado;
+	}
+	return 1;
+}
+
+ACAO gera_acao(){
+	player.mundo_conhecido[player.y][player.x] = 
+			mapa[player.y][player.x];
+	if(verifica_estado(player.x,player.y,FEDOR)){
+		
+	}
+	return 0;
 }
