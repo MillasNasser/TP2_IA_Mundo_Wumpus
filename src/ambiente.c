@@ -3,6 +3,7 @@
 void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag){
 	iniciar_mapa();
 	FILE *arquivo;
+	//Flag = 1: O mapa é carregado do arquivo. Flag = 0: O mapa foi gerado aleatoriamente e passado por parâmetro.
 	if(flag){
 		arquivo=fopen(nome_arquivo,"r");
 		if(arquivo == NULL){
@@ -13,7 +14,6 @@ void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag
 	int posicao_x,posicao_y;
 	int jogador_iniciado=0, ouro_iniciado=0, wumpus_iniciado=0, quantidade_pocos=0;
 	char estado;
-	//fscanf(arquivo,"%d\n",&tamanho_mapa);
 	for(posicao_y=0;posicao_y<TAM_MAPA;posicao_y++){
 		for(posicao_x=0;posicao_x<TAM_MAPA;posicao_x++){
 			if(flag){
@@ -43,7 +43,6 @@ void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag
 				}
 				case 'W':{
 					if(!wumpus_iniciado){
-						
 						mapa[posicao_y][posicao_x]|=WUMPUS;
 						somar_rastros(FEDOR,posicao_y,posicao_x);
 						wumpus_iniciado=1;
@@ -168,11 +167,9 @@ void somar_rastros(char valor, int posicao_y, int posicao_x){
 
 void gerar_mapa(char *nome_arquivo){
 	char mapa_arquivo[TAM_MAPA][TAM_MAPA];
-	//do{
 	iniciar_mapa_arquivo(mapa_arquivo);
 
 	//Escolhendo a posição inicial do jogador.
-	//int posicao_jogador=rand()%4;
 	int jogador_pos_x=TAM_MAPA-1,jogador_pos_y=0;
 	mapa_arquivo[jogador_pos_x][jogador_pos_y]='J';
 
@@ -181,41 +178,27 @@ void gerar_mapa(char *nome_arquivo){
 	do{
 		ouro_x=rand()%4;
 		ouro_y=rand()%4;
-	}while(mapa_arquivo[ouro_x][ouro_y]!='-' && verificar_redor_inicial_jogador(jogador_pos_x,jogador_pos_y,ouro_x,ouro_y,mapa_arquivo));
+	}while(mapa_arquivo[ouro_x][ouro_y]!='-' && verificar_redor_inicial_jogador(jogador_pos_x,jogador_pos_y,ouro_x,ouro_y));
 	mapa_arquivo[ouro_x][ouro_y]='R';
 	
 	//Gerando as posições dos poços. Sempre serão gerados 3 poços.
 	int pocos_validos=0;
 	while(!pocos_validos){
-		printf("AA\n");
 		int posicoes[3][2];
 		int valido=0;
 		int i;
 		for(i=0;i<3;i++){
 			while(!valido){
-				
 				posicoes[i][0]=rand()%4;
 				posicoes[i][1]=rand()%4;
-				//printf("AA %d,%d\n",posicoes[i][0],posicoes[i][1]);
 				int pos0=posicoes[i][0], pos1=posicoes[i][1];
-				if(mapa_arquivo[pos0][pos1]=='-' && verificar_redor_inicial_jogador(jogador_pos_x,jogador_pos_y,pos0,pos1,mapa_arquivo)){
+				if(mapa_arquivo[pos0][pos1]=='-' && verificar_redor_inicial_jogador(jogador_pos_x,jogador_pos_y,pos0,pos1)){
 					mapa_arquivo[pos0][pos1]='P';
 					valido=1;
 				}
 			}
 			valido=0;
 		}
-		
-		printf("Pocos:\n");
-		int a,b;
-		for(a=0;a<TAM_MAPA;a++){
-			for(b=0;b<TAM_MAPA;b++){
-				printf("%c ",mapa_arquivo[a][b]);
-			}
-			printf("\n");
-		}
-		printf("\n\n");
-		
 		
 		if(verificar_solucao_possivel_mapa(ouro_x,ouro_y,mapa_arquivo)){
 			pocos_validos=1;
@@ -224,10 +207,7 @@ void gerar_mapa(char *nome_arquivo){
 			mapa_arquivo[posicoes[1][0]][posicoes[1][1]]='-';
 			mapa_arquivo[posicoes[2][0]][posicoes[2][1]]='-';
 		}
-		//getchar();
 	}
-	
-	
 	
 	//Gerando posição do Wumpus.
 	int wumpus_x,wumpus_y;
@@ -243,7 +223,6 @@ void gerar_mapa(char *nome_arquivo){
 
 	criar_arquivo(nome_arquivo,mapa_arquivo);
 	carregar_mapa(nome_arquivo,mapa_arquivo,0);
-	//}while(!verificar_solucao_possivel_mapa());
 }
 
 int verificar_mapa_valido(){
@@ -254,122 +233,69 @@ int verificar_mapa_valido(){
 int verificar_solucao_possivel_mapa(int posicao_x, int posicao_y, char matriz[TAM_MAPA][TAM_MAPA]){
 	//Verifica o redor do ouro para descobrir se é possível que o jogador possa pegá-lo.
 	if(posicao_x==0 && (posicao_y>0 && posicao_y<TAM_MAPA-1)){//Linha 0
-		if(matriz[posicao_x][posicao_y-1] =='P' && matriz[posicao_x+1][posicao_y]=='P' && matriz[posicao_x][posicao_y+1] == 'P'){	
+		if(matriz[posicao_x][posicao_y-1] =='P' && matriz[posicao_x+1][posicao_y]=='P' && matriz[posicao_x][posicao_y+1] == 'P')
 			return 0;
-		}
 		return 1;
 	}
 	
 	if(posicao_x==TAM_MAPA-1 && (posicao_y>0 && posicao_y<TAM_MAPA-1)){//Linha TAM_MAPA-1
-		if(matriz[posicao_x][posicao_y-1] =='P' && matriz[posicao_x-1][posicao_y]=='P' && matriz[posicao_x][posicao_y+1] == 'P'){
+		if(matriz[posicao_x][posicao_y-1] =='P' && matriz[posicao_x-1][posicao_y]=='P' && matriz[posicao_x][posicao_y+1] == 'P')
 			return 0;
-		}
 		return 1;
 	}
 	
 	if((posicao_x>0 && posicao_x<TAM_MAPA-1) && posicao_y==0){//Coluna 0
-		if(matriz[posicao_x-1][posicao_y] =='P' && matriz[posicao_x][posicao_y+1]=='P' && matriz[posicao_x+1][posicao_y] == 'P'){
-			
+		if(matriz[posicao_x-1][posicao_y] =='P' && matriz[posicao_x][posicao_y+1]=='P' && matriz[posicao_x+1][posicao_y] == 'P')
 			return 0;
-		}
 		return 1;
 	}
 	
 	if((posicao_x>0 && posicao_x<TAM_MAPA-1) && posicao_y==TAM_MAPA-1){//Coluna TAM_MAPA-1
-		if(matriz[posicao_x-1][posicao_y] =='P' && matriz[posicao_x][posicao_y-1]=='P' && matriz[posicao_x+1][posicao_y] == 'P'){
-			
+		if(matriz[posicao_x-1][posicao_y] =='P' && matriz[posicao_x][posicao_y-1]=='P' && matriz[posicao_x+1][posicao_y] == 'P')
 			return 0;
-		}
 		return 1;
 	}
 	
 	if(posicao_x == 0 && posicao_y ==0){//Posicao [0,0]
-		if(matriz[posicao_x+1][posicao_y]=='P' && matriz[posicao_x][posicao_y+1]=='P'){
+		if(matriz[posicao_x+1][posicao_y]=='P' && matriz[posicao_x][posicao_y+1]=='P')
 			return 0;
-		}
-		if(matriz[posicao_x+1][posicao_y]=='P' && matriz[posicao_x+1][posicao_y+1]=='P' && matriz[posicao_x][posicao_y+2]=='P'){
+		if(matriz[posicao_x+1][posicao_y]=='P' && matriz[posicao_x+1][posicao_y+1]=='P' && matriz[posicao_x][posicao_y+2]=='P')
 			return 0;
-		}
-		if(matriz[posicao_x][posicao_y+1]=='P' && matriz[posicao_x+1][posicao_y+1]=='P' && matriz[posicao_x+2][posicao_y]=='P'){
+		if(matriz[posicao_x][posicao_y+1]=='P' && matriz[posicao_x+1][posicao_y+1]=='P' && matriz[posicao_x+2][posicao_y]=='P')
 			return 0;
-		}
 		return 1;
 	}
 	
 	if(posicao_x == 0 && posicao_y ==TAM_MAPA-1){//Posicao [0,TAM_MAPA-1]
-		if(matriz[posicao_x+1][posicao_y]=='P' && matriz[posicao_x][posicao_y-1]=='P'){
+		if(matriz[posicao_x+1][posicao_y]=='P' && matriz[posicao_x][posicao_y-1]=='P')
 			return 0;
-		}
-		if(matriz[posicao_x+1][posicao_y]=='P' && matriz[posicao_x+1][posicao_y-1]=='P' && matriz[posicao_x][posicao_y-2]=='P'){
+		if(matriz[posicao_x+1][posicao_y]=='P' && matriz[posicao_x+1][posicao_y-1]=='P' && matriz[posicao_x][posicao_y-2]=='P')
 			return 0;
-		}
-		if(matriz[posicao_x][posicao_y-1]=='P' && matriz[posicao_x+1][posicao_y-1]=='P' && matriz[posicao_x+2][posicao_y]=='P'){
-			return 0;
-		}
-		return 1;
-	}
-	/*
-	if(posicao_x == TAM_MAPA-1 && posicao_y ==0){//Posicao [TAM_MAPA-1,0]
-		if(matriz[posicao_x-1][posicao_y]=='P' && matriz[posicao_x][posicao_y+1]=='P')
-			return 0;
-		if(matriz[posicao_x-1][posicao_y]=='P' && matriz[posicao_x-1][posicao_y+1]=='P' && matriz[posicao_x][posicao_y+2]=='P')
-			return 0;
-		if(matriz[posicao_x][posicao_y+1]=='P' && matriz[posicao_x-1][posicao_y+1]=='P' && matriz[posicao_x-2][posicao_y]=='P')
+		if(matriz[posicao_x][posicao_y-1]=='P' && matriz[posicao_x+1][posicao_y-1]=='P' && matriz[posicao_x+2][posicao_y]=='P')
 			return 0;
 		return 1;
 	}
-	 */
 	
 	if(posicao_x == TAM_MAPA-1 && posicao_y ==TAM_MAPA-1){//Posicao
-		if(matriz[posicao_x-1][posicao_y]=='P' && matriz[posicao_x][posicao_y-1]=='P'){
+		if(matriz[posicao_x-1][posicao_y]=='P' && matriz[posicao_x][posicao_y-1]=='P')
 			return 0;
-		}
-		if(matriz[posicao_x-1][posicao_y]=='P' && matriz[posicao_x-1][posicao_y-1]=='P' && matriz[posicao_x][posicao_y-2]=='P'){
+		if(matriz[posicao_x-1][posicao_y]=='P' && matriz[posicao_x-1][posicao_y-1]=='P' && matriz[posicao_x][posicao_y-2]=='P')
 			return 0;
-		}
-		if(matriz[posicao_x][posicao_y-1]=='P' && matriz[posicao_x-1][posicao_y-1]=='P' && matriz[posicao_x-2][posicao_y]=='P'){
+		if(matriz[posicao_x][posicao_y-1]=='P' && matriz[posicao_x-1][posicao_y-1]=='P' && matriz[posicao_x-2][posicao_y]=='P')
 			return 0;
-		}
 		return 1;
 	}
 	return 1;
 }
 
-int verificar_redor_inicial_jogador(int jogador_x, int jogador_y, int posicao_x, int posicao_y, char matriz[TAM_MAPA][TAM_MAPA]){
-	/*
-	if(jogador_x == 0 && jogador_y ==0){
-		if((posicao_x==1 && posicao_y==0) || (posicao_x==0 && posicao_y==1) || (posicao_x==1 && posicao_y==1))
-			return 0;
-		return 1;
-	}
-	
-	if(jogador_x == 0 && jogador_y ==TAM_MAPA-1){
-		if((posicao_x==0 && posicao_y==TAM_MAPA-2) || (posicao_x==1 && posicao_y==TAM_MAPA-1) || (posicao_x==1 && posicao_y==TAM_MAPA-2))
-			return 0;
-		return 1;
-	}
-	
-	if(jogador_x == TAM_MAPA-1 && jogador_y ==0){
-	 */
-		if((posicao_x==TAM_MAPA-2 && posicao_y==0) || (posicao_x==TAM_MAPA-1 && posicao_y==1) || (posicao_x==TAM_MAPA-2 && posicao_y==1))
-			return 0;
-		
-		return 1;
-	/*
-	}
-	
-	if(jogador_x == TAM_MAPA-1 && jogador_y ==TAM_MAPA-1){
-		if((posicao_x==TAM_MAPA-1 && posicao_y==TAM_MAPA-2) || (posicao_x==TAM_MAPA-2 && posicao_y==TAM_MAPA-1) || (posicao_x==TAM_MAPA-2 && posicao_y==TAM_MAPA-2))
-			return 0;
-		return 1;
-	}
-	return 0;
-	 */
+int verificar_redor_inicial_jogador(int jogador_x, int jogador_y, int posicao_x, int posicao_y){
+	if((posicao_x==TAM_MAPA-2 && posicao_y==0) || (posicao_x==TAM_MAPA-1 && posicao_y==1) || (posicao_x==TAM_MAPA-2 && posicao_y==1))
+		return 0;	
+	return 1;
 }
 
 void criar_arquivo(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA]){
 	FILE *arquivo = fopen(nome_arquivo,"w");
-	//fprintf(arquivo,"%d\n",TAM_MAPA);
 	int i,j;
 	for(i=0;i<TAM_MAPA;i++){
 		for(j=0;j<TAM_MAPA;j++){
