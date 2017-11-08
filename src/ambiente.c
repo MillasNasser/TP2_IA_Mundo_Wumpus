@@ -11,7 +11,40 @@ void gera_mapa(){
 	mapa[2][1] = BRISA;		mapa[3][1] = BRISA;
 }
 
-int verifica_estado(int x, int y, ESTADO estado){
-	//TO-DO: talvez converter X e Y pras coordenadas de matriz.
-	return ((player.mundo_conhecido[x][y] & (estado)) == estado);
+int verifica_estado(char mapa[TAM_MAPA][TAM_MAPA], int x, int y, ESTADO estado){
+	return ((mapa[x][y] & (estado)) == estado);
+}
+
+void __imprime_mapa_linha(char hor, char vert, int x){
+	int i;
+	for(i = 0; i < (TAM_MAPA * x) + TAM_MAPA + 1; i++){
+		printf("%c", (i % TAM_MAPA) ? hor : vert);
+	}
+	printf("\n");
+}
+
+void imprime_mapa(char mapa[TAM_MAPA][TAM_MAPA]){
+	int i, j, k, l;
+	int x = 3, y = 2;
+	char vert = ':', hor = '-';
+	int bit;
+
+	char simbolos[7] = {' ', 'B', 'P', 'F', 'W', 'R', 'J'};
+	
+	__imprime_mapa_linha(hor, vert, x);
+	for(i=0; i<TAM_MAPA; i++){
+		for(l=0; l<y; l++){
+			printf("%c", vert);
+			for(j=0; j<TAM_MAPA; j++){
+				for(k=0; k<x; k++){
+					bit = k + (l*x);
+					printf("%c", simbolos[ (bit+1) * verifica_estado(mapa, i, j, 1 << bit) ]);
+				}
+				printf("%c", vert);
+			}
+			printf("\n");
+		}
+		__imprime_mapa_linha(hor, vert, x);
+	}
+	printf("\n");
 }
