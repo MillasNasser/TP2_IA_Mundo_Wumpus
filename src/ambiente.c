@@ -128,108 +128,105 @@ void iniciar_mapa_arquivo(char matriz[TAM_MAPA][TAM_MAPA]){
 }
 
 void somar_rastros(char valor, int posicao_y, int posicao_x){
-	//Esquerda
-	printf("\nteste: [%d/%d]\n",posicao_y-1,posicao_x);
-	if(posicao_x-1>=0){
-		//printf("\nValor:%d\n",mapa[posicao_x][posicao_y-1]);
+	if(posicao_x-1>=0)//Esquerda
 		mapa[posicao_y][posicao_x-1]|=valor;
-		
-	}
-	
-	//Cima
-	
-	if(posicao_y-1>=0){
+
+	if(posicao_y-1>=0)//Cima
 		mapa[posicao_y-1][posicao_x]|=valor;
-	}
 	
-	//Direita
-	if(posicao_x+1<TAM_MAPA){
+	if(posicao_x+1<TAM_MAPA)//Direita
 		mapa[posicao_y][posicao_x+1]|=valor;
-	}
 	
-	//Baixo
-	if(posicao_y+1<TAM_MAPA){
+	if(posicao_y+1<TAM_MAPA)//Baixo
 		mapa[posicao_y+1][posicao_x]|=valor;
-	}
 }
 
 void gerar_mapa(char *nome_arquivo){
 	char mapa_arquivo[TAM_MAPA][TAM_MAPA];
 	//do{
-		iniciar_mapa_arquivo(mapa_arquivo);
-		
-		//Escolhendo a posição inicial do jogador.
-		//int posicao_jogador=rand()%4;
-		int jogador_pos_x,jogador_pos_y;
-		switch(rand()%4){ //O fator de divisão é 4 por causa dos 4 cantos do mapa, não do tamanho do mapa.
-			case 0:{
-				jogador_pos_x=0;
-				jogador_pos_y=0;
-				break;
-			}
-			case 1:{ 
-				jogador_pos_x=0;
-				jogador_pos_y=TAM_MAPA-1;
-				break;
-			}
-			case 2:{
-				jogador_pos_x=TAM_MAPA-1;
-				jogador_pos_y=0;
-				break;
-			}
-			case 3:{
-				jogador_pos_x=TAM_MAPA-1;
-				jogador_pos_y=TAM_MAPA-1;
-			}
-			
+	iniciar_mapa_arquivo(mapa_arquivo);
+
+	//Escolhendo a posição inicial do jogador.
+	//int posicao_jogador=rand()%4;
+	int jogador_pos_x,jogador_pos_y;
+	switch(rand()%4){ //O fator de divisão é 4 por causa dos 4 cantos do mapa, não do tamanho do mapa.
+		case 0:{
+			jogador_pos_x=0;
+			jogador_pos_y=0;
+			break;
 		}
-		mapa_arquivo[jogador_pos_x][jogador_pos_y]='J';
-		
-		//Gerando a posicao do ouro;
-		int ouro_x,ouro_y;
-		do{
-			ouro_x=rand()%4;
-			ouro_y=rand()%4;
-		}while(mapa_arquivo[ouro_x][ouro_y]!='-');
-		mapa_arquivo[ouro_x][ouro_y]='R';
-		
-		//Gerando as posições dos poços. Sempre serão gerados 3 poços.
-		int pocos_validos=0;
-		while(!pocos_validos){
-			int posicoes[3][2];
-			int valido=0;
-			int i,j;
-			for(i=0;i<3;i++){
-				while(!valido){
-					for(j=0;j<2;j++){
-						posicoes[i][j]=rand()%4;
-					}
-					int pos0=posicoes[i][0], pos1=posicoes[i][1];
-					if(mapa_arquivo[pos0][pos1]=='-' && !verificar_redor_inicial_jogador(jogador_pos_x,jogador_pos_y,pos0,pos1,mapa_arquivo)){
-						mapa_arquivo[pos0][pos1]='P';
-						valido=1;
-					}
+		case 1:{ 
+			jogador_pos_x=0;
+			jogador_pos_y=TAM_MAPA-1;
+			break;
+		}
+		case 2:{
+			jogador_pos_x=TAM_MAPA-1;
+			jogador_pos_y=0;
+			break;
+		}
+		case 3:{
+			jogador_pos_x=TAM_MAPA-1;
+			jogador_pos_y=TAM_MAPA-1;
+		}
+
+	}
+	mapa_arquivo[jogador_pos_x][jogador_pos_y]='J';
+
+	//Gerando a posicao do ouro;
+	int ouro_x,ouro_y;
+	do{
+		ouro_x=rand()%4;
+		ouro_y=rand()%4;
+	}while(mapa_arquivo[ouro_x][ouro_y]!='-');
+	mapa_arquivo[ouro_x][ouro_y]='R';
+
+	//Gerando as posições dos poços. Sempre serão gerados 3 poços.
+	int pocos_validos=0;
+	while(!pocos_validos){
+		int posicoes[3][2];
+		int valido=0;
+		int i;
+		for(i=0;i<3;i++){
+			while(!valido){
+				
+				posicoes[i][0]=rand()%4;
+				posicoes[i][1]=rand()%4;
+				printf("AA %d,%d\n",posicoes[i][0],posicoes[i][1]);
+				int pos0=posicoes[i][0], pos1=posicoes[i][1];
+				if(mapa_arquivo[pos0][pos1]=='-' && !verificar_redor_inicial_jogador(jogador_pos_x,jogador_pos_y,pos0,pos1,mapa_arquivo)){
+					mapa_arquivo[pos0][pos1]='P';
+					valido=1;
 				}
 			}
-			if(verificar_solucao_possivel_mapa(ouro_x,ouro_y,mapa_arquivo)){
-				pocos_validos=1;
-			}else{
-				mapa_arquivo[posicoes[0][0]][posicoes[0][1]]='-';
-				mapa_arquivo[posicoes[1][0]][posicoes[1][1]]='-';
-				mapa_arquivo[posicoes[2][0]][posicoes[2][1]]='-';
-			}
-			
+			valido=0;
 		}
 		
-		int wumpus_x,wumpus_y;
-		do{
-			wumpus_x=rand()%4;
-			wumpus_y=rand()%4;
-		}while(mapa_arquivo[wumpus_x][wumpus_y]!='-');
-		mapa_arquivo[wumpus_x][wumpus_y]='W';
+		printf("Pocos:\n");
+		int a;
+		for(a=0;a<3;a++){
+			printf("[%d,%d]\n",posicoes[a][0],posicoes[a][1]);
+		}
 		
-		criar_arquivo(nome_arquivo,mapa_arquivo);
-		carregar_mapa(nome_arquivo);
+		if(verificar_solucao_possivel_mapa(ouro_x,ouro_y,mapa_arquivo)){
+			pocos_validos=1;
+		}else{
+			mapa_arquivo[posicoes[0][0]][posicoes[0][1]]='-';
+			mapa_arquivo[posicoes[1][0]][posicoes[1][1]]='-';
+			mapa_arquivo[posicoes[2][0]][posicoes[2][1]]='-';
+		}
+	}
+	
+	//Gerando posição do Wumpus.
+	int wumpus_x,wumpus_y;
+	do{
+		wumpus_x=rand()%4;
+		wumpus_y=rand()%4;
+	}while(mapa_arquivo[wumpus_x][wumpus_y]!='-');
+	mapa_arquivo[wumpus_x][wumpus_y]='W';
+
+	criar_arquivo(nome_arquivo,mapa_arquivo);
+	carregar_mapa(nome_arquivo);
 	//}while(!verificar_solucao_possivel_mapa());
 }
 
