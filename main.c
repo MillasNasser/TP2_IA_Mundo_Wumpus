@@ -3,7 +3,8 @@
 int main(int argc,char **argv){
 	srand( (unsigned)time(NULL) );
 	if(argv[1] != NULL){
-		carregar_mapa(argv[1]);
+		char matriz[TAM_MAPA][TAM_MAPA];
+		carregar_mapa(argv[1],matriz,1);
 	}else{
 		gerar_mapa("teste_gerado.txt");
 	}

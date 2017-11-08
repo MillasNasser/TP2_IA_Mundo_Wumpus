@@ -21,7 +21,7 @@ int verificar_redor_inicial_jogador(int jogador_x, int jogador_y, int posicao_x,
 
 void criar_arquivo(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA]);
 
-void carregar_mapa(char *nome_arquivo);
+void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag);
 
 void exibir_mapa();
 
