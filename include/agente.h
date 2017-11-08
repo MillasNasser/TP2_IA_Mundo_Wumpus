@@ -27,7 +27,7 @@ void agir(ACAO acao);
 /*Define a acção que o agente irá tomar*/
 ACAO gera_acao();
 
-void inicializa_jogador();
+void inicializa_jogador(int posicao_x, int posicao_y);
 
 void imprime_mundo_conhecido();
 
