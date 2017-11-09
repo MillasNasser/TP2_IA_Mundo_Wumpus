@@ -124,32 +124,39 @@ void imprime_mundo_conhecido(){
 	imprime_mapa(player.mundo_conhecido);
 }
 
+/*Remove suposições a estados que estão adjacentes à posição que o agente está*/
+/*TO-DO: Não alterar estados que são visitados*/
 void retirar_estado(ESTADO estado){
 	int x = player.x;
 	int y = player.y;
-	if(x > 0)
+	/*Estados adjacentes*/
+	if(x > 0 && !verifica_estado(player.mundo_conhecido,y,x-1,VISITADO)) //OESTE
 		player.mundo_conhecido[y][x-1] &= ~estado;
-	if(x < TAM_MAPA)
+	if(x < TAM_MAPA && !verifica_estado(player.mundo_conhecido,y,x+1,VISITADO)) //LESTE
 		player.mundo_conhecido[y][x+1] &= ~estado;
-	if(y > 0)
+	if(y > 0 && !verifica_estado(player.mundo_conhecido,y-1,x,VISITADO))//NORTE
 		player.mundo_conhecido[y-1][x] &= ~estado;
-	if(y < TAM_MAPA)
+	if(y < TAM_MAPA && !verifica_estado(player.mundo_conhecido,y+1,x,VISITADO))//SUL
 		player.mundo_conhecido[y+1][x] &= ~estado;
 }
 
+/*Adiciona suposições a estados que estão adjacentes à posição que o agente está*/
+/*TO-DO: Não alterar estados que são visitados*/
 void adicionar_estado(ESTADO estado){
 	int x = player.x;
 	int y = player.y;
-	if(x > 0 && !verifica_estado(player.mundo_conhecido,y,x-1,CONHECIDO))
+	/*Estados adjacentes*/
+	if(x > 0 && !verifica_estado(player.mundo_conhecido,y,x-1,CONHECIDO|VISITADO))//OESTE
 		player.mundo_conhecido[y][x-1] |= estado;
-	if(x < TAM_MAPA && !verifica_estado(player.mundo_conhecido,y,x+1,CONHECIDO))
+	if(x < TAM_MAPA && !verifica_estado(player.mundo_conhecido,y,x+1,CONHECIDO|VISITADO))//LESTE
 		player.mundo_conhecido[y][x+1] |= estado;
-	if(y > 0 && !verifica_estado(player.mundo_conhecido,y-1,x,CONHECIDO))
+	if(y > 0 && !verifica_estado(player.mundo_conhecido,y-1,x,CONHECIDO|VISITADO))//NORTE
 		player.mundo_conhecido[y-1][x] |= estado;
-	if(y < TAM_MAPA && !verifica_estado(player.mundo_conhecido,y+1,x,CONHECIDO))
+	if(y < TAM_MAPA && !verifica_estado(player.mundo_conhecido,y+1,x,CONHECIDO|VISITADO))//SUL
 		player.mundo_conhecido[y+1][x] |= estado;
 }
 
+/*Define as respectivas suposições em relação a posição a que o agente está presente*/
 int marcar_estados_adj(){
 	int estado = 0;
 	int x = player.x, 
@@ -170,8 +177,16 @@ int marcar_estados_adj(){
 }
 
 ACAO gera_acao(){
+	int x = player.x,
+		y = player.y;
+
 	player.mundo_conhecido[player.y][player.x] = 
 			mapa[player.y][player.x];
+	//Se a posição do agente não foi visitado
+	if(!verifica_estado(player.mundo_conhecido,y,x,VISITADO)){
+		player.mundo_conhecido[y][x] &= ~CONHECIDO;
+		player.mundo_conhecido[y][x] |= VISITADO;
+	}
 	if(verifica_estado(player.x,player.y,FEDOR)){
 		
 	}
