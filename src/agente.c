@@ -130,13 +130,13 @@ void retirar_estado(ESTADO estado){
 	int x = player.x;
 	int y = player.y;
 	/*Estados adjacentes*/
-	if(x > 0 && !verifica_estado(player.mundo_conhecido,y,x-1,VISITADO)) //OESTE
+	if(x > 0 ) //OESTE
 		player.mundo_conhecido[y][x-1] &= ~estado;
-	if(x < TAM_MAPA && !verifica_estado(player.mundo_conhecido,y,x+1,VISITADO)) //LESTE
+	if(x < TAM_MAPA) //LESTE
 		player.mundo_conhecido[y][x+1] &= ~estado;
-	if(y > 0 && !verifica_estado(player.mundo_conhecido,y-1,x,VISITADO))//NORTE
+	if(y > 0) //NORTE
 		player.mundo_conhecido[y-1][x] &= ~estado;
-	if(y < TAM_MAPA && !verifica_estado(player.mundo_conhecido,y+1,x,VISITADO))//SUL
+	if(y < TAM_MAPA) //SUL
 		player.mundo_conhecido[y+1][x] &= ~estado;
 }
 
