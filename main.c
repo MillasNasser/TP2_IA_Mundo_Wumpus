@@ -1,16 +1,19 @@
 #include "ambiente.h"
 
-int main(){
-    int i,j;
-    inicializa_jogador();
-    gera_mapa();
-
-    imprime_mapa(mapa);
-
-    /*while(!verica_estado(player.x, player.y, RELUSENTE)){
-	    
-	    SENTIDO temp;
-	    agir(gera_acao(), temp);
-    }*/
-    return 0;
+int main(int argc,char **argv){
+	srand( (unsigned)time(NULL) );
+	if(argv[1] != NULL){
+		char matriz[TAM_MAPA][TAM_MAPA];
+		carregar_mapa(argv[1],matriz,1);
+	}else{
+		gerar_mapa("teste_gerado.txt");
+	}
+	//inicializa_jogador();
+	//gera_mapa();
+	
+	exit(0);
+	while(!verica_estado(player.x, player.y, RELUSENTE)){
+		agir(gera_acao());
+	}
+	return 0;
 }
