@@ -67,8 +67,6 @@ void pegarOuro(){
     pontuar(PREMIUM);
 }
 
-
-
 void atirarFlecha(SENTIDO sentido){
 	
 	if(!player.flecha){
@@ -145,19 +143,36 @@ int marcar_estados_adj(){
 	return 1;
 }
 
-ACAO gera_acao(){
+/*Sempre inicia no 0 o nivel da função, logo passe apenas 0*/
+ACAO gera_acao(int nivel){
+	int i,j;
+	int livre = 0,
+		wumpus = 0,
+		poco = 0;
+
 	int x = player.x,
 		y = player.y;
 
 	player.mundo_conhecido[player.y][player.x] = 
 			mapa[player.y][player.x];
-	//Se a posição do agente não foi visitado
+	/* Se a posição do agente não foi visitado, a define
+	 * como visitado */
 	if(!verifica_estado(player.mundo_conhecido,y,x,VISITADO)){
 		player.mundo_conhecido[y][x] &= ~CONHECIDO;
 		player.mundo_conhecido[y][x] |= VISITADO;
 	}
-	if(verifica_estado(player.x,player.y,FEDOR)){
+
+	if(nivel != 0){
 		
 	}
+
+	char matriz_estado[3][TAM_MAPA]= {{0}};
+	for(i = -1; i <= 1; i++){
+		for(j = -1; j <= 1; j++){
+			if(i==j || i+j == 0) continue;
+			if()
+		}
+	}
+
 	return 0;
 }

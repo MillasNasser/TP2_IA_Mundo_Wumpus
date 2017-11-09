@@ -16,6 +16,8 @@
 //a é no formato ab (a,b): ous seja representar 20
 //é equivalente à (2,0)
 #define vetorizar(a) (a/10)*TAM_MAPA + (a%10)
+#define matri_x(v_vect) v_vect%TAM_MAPA 
+#define matri_y(v_vect) v_vect/TAM_MAPA
 
 typedef enum{
     
