@@ -13,6 +13,10 @@
 // Macro para obter o módulo de uma operação.
 #define MODULO(x) ((x)>=0?(x):-(x))
 
+//a é no formato ab (a,b): ous seja representar 20
+//é equivalente à (2,0)
+#define vetorizar(a) (a/10)*TAM_MAPA + (a%10)
+
 typedef enum{
     
     ANDAR, ATIRAR, PEGAR
@@ -34,6 +38,12 @@ typedef struct s_Personagem{
 }Personagem;
 
 Personagem player;
+
+char salva_retorno[16] = {0};
+
+extern int verifica_estado();
+
+extern char mapa[TAM_MAPA][TAM_MAPA];
 
 /*TO-DO: Faz a movimentação do personagem
  *		 gastando pontos dependendo do movimento*/
