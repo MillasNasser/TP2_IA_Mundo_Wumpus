@@ -7,9 +7,15 @@
 
 typedef enum{
 	
-    BRISA=1, FEDOR=2, POCO=4, WUMPUS=8, 
-    RELUSENTE=16, CONHECIDO=32, 
-    VISITADO=64, JOGADOR=128            
+    BRISA=1, 
+    FEDOR=2, 
+    POCO=4, 
+    WUMPUS=8, 
+    RELUSENTE=16, 
+    JOGADOR=32,
+    CONHECIDO=64, 
+    VISITADO=128 
+              
 }ESTADO;
 
 #define TAM_MAPA 4
@@ -27,9 +33,6 @@ void criar_arquivo(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA]);
 
 //Carrega o mapa do arquivo ou por parâmetro (foi gerado aleatoriamente). Verifica por erros no arquivo e inicia o mapa com todos os status corretos em cada posição.
 void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag);
-
-//Exibir o mapa na tela. (Debug)
-void exibir_mapa();
 
 //Inicia todas as posições do mapa com 0;
 void iniciar_mapa();
@@ -58,5 +61,9 @@ int verificar_solucao_possivel_mapa(int posicao_x, int posicao_y, char matriz[TA
 int verifica_estado(char mapa[TAM_MAPA][TAM_MAPA], int x, int y, ESTADO estado);
 
 void imprime_mapa(char mapa[TAM_MAPA][TAM_MAPA]);
+
+void adicionar_estado(char mapa[TAM_MAPA][TAM_MAPA], int x, int y, ESTADO estado);
+
+void retirar_estado(char mapa[TAM_MAPA][TAM_MAPA], int x, int y, ESTADO estado);
 
 #endif /*_AMBIENTE_H_*/

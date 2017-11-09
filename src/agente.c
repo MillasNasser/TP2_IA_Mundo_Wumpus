@@ -11,10 +11,12 @@ void __preenche_mundo_conhecido(int valor){
 }
 
 void inicializa_jogador(){
+	
 	__preenche_mundo_conhecido(0);
 	player.mundo_conhecido[3][0] = JOGADOR;
-	player.y = 3; player.x = 0;
-    player.pontos = 0; // definindo pontuação inicial
+	player.y = 3; player.x = 0;	    
+	mapa[3][0] = JOGADOR;
+	player.pontos = 0; // definindo pontuação inicial
 }					   // para teste.
 
 void pontuar(int pontos){
@@ -95,8 +97,7 @@ void atirarFlecha(SENTIDO sentido){
 	}
 	if(verifica_estado(mapa, y, x, WUMPUS)){		
 		
-		//TO-DO chamar a função de alterar estado para as 
-		// casas vizinhas a posição (x,y) e para (x,y).
+		retirar_estado(mapa, x, y, WUMPUS);
 	}
     pontuar(THROW_ARROW);
 }
@@ -124,32 +125,6 @@ void imprime_mundo_conhecido(){
 	imprime_mapa(player.mundo_conhecido);
 }
 
-void retirar_estado(ESTADO estado){
-	int x = player.x;
-	int y = player.y;
-	if(x > 0)
-		player.mundo_conhecido[y][x-1] &= ~estado;
-	if(x < TAM_MAPA)
-		player.mundo_conhecido[y][x+1] &= ~estado;
-	if(y > 0)
-		player.mundo_conhecido[y-1][x] &= ~estado;
-	if(y < TAM_MAPA)
-		player.mundo_conhecido[y+1][x] &= ~estado;
-}
-
-void adicionar_estado(ESTADO estado){
-	int x = player.x;
-	int y = player.y;
-	if(x > 0 && !verifica_estado(player.mundo_conhecido,y,x-1,CONHECIDO))
-		player.mundo_conhecido[y][x-1] |= estado;
-	if(x < TAM_MAPA && !verifica_estado(player.mundo_conhecido,y,x+1,CONHECIDO))
-		player.mundo_conhecido[y][x+1] |= estado;
-	if(y > 0 && !verifica_estado(player.mundo_conhecido,y-1,x,CONHECIDO))
-		player.mundo_conhecido[y-1][x] |= estado;
-	if(y < TAM_MAPA && !verifica_estado(player.mundo_conhecido,y+1,x,CONHECIDO))
-		player.mundo_conhecido[y+1][x] |= estado;
-}
-
 int marcar_estados_adj(){
 	int estado = 0;
 	int x = player.x, 
@@ -158,22 +133,23 @@ int marcar_estados_adj(){
 	//Verifica se na posição possui brisa ou fedor
 	for(estado = 1; estado < 4; estado*=2){
 		//Se não houver retire dos que estão em volta
-		if(!verifica_estado(player.mundo_conhecido,y,x,estado)){
-			retirar_estado(estado * 4);
-			adicionar_estado(CONHECIDO);
+		if(!verifica_estado(player.mundo_conhecido, y, x, estado)){
+			retirar_estado(player.mundo_conhecido, x, y, estado * 4);
+			adicionar_estado(player.mundo_conhecido, x, y, CONHECIDO);
 		//Se houver verifica se não foi retirado
 		}else{
-			adicionar_estado(estado * 4);
+			adicionar_estado(player.mundo_conhecido, x, y,estado * 4);
 		}
 	}
 	return 1;
 }
 
 ACAO gera_acao(){
+	
 	player.mundo_conhecido[player.y][player.x] = 
 			mapa[player.y][player.x];
-	if(verifica_estado(player.x,player.y,FEDOR)){
-		
+	if(verifica_estado(player.mundo_conhecido, 
+		player.x,player.y,FEDOR)){		
 	}
 	return 0;
 }

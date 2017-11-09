@@ -12,7 +12,7 @@ void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag
 		}
 	}
 	int posicao_x,posicao_y;
-	int jogador_iniciado=0, ouro_iniciado=0, wumpus_iniciado=0, quantidade_pocos=0;
+	int ouro_iniciado = 0, wumpus_iniciado = 0, quantidade_pocos = 0;
 	char estado;
 	for(posicao_y=0;posicao_y<TAM_MAPA;posicao_y++){
 		for(posicao_x=0;posicao_x<TAM_MAPA;posicao_x++){
@@ -74,8 +74,9 @@ void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag
 					break;
 				}
 				case 'J':{
-					if(!jogador_iniciado){
+					/*if(!jogador_iniciado){
 						if((posicao_y == 0 || posicao_y == TAM_MAPA-1) && (posicao_x == 0 || posicao_x == TAM_MAPA-1)){
+							
 							inicializa_jogador(posicao_y,posicao_x);
 							jogador_iniciado=1;
 						}else{
@@ -85,7 +86,7 @@ void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag
 					}else{
 						printf("Erro: O jogador só pode iniciar em uma posicao, apenas.\n");
 						exit(0);
-					}
+					}*/
 					break;
 				}
 				case '-':{
@@ -105,18 +106,12 @@ void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag
 		if(flag)
 			fscanf(arquivo,"\n");
 		printf("\n");
-	}
-	if(!jogador_iniciado){
-		printf("\nO jogador não foi iniciado no mapa!\n");
-		exit(0);
-	}
+	}	
 	if(!ouro_iniciado){
 		printf("\nO mapa nao possui nenhum ouro!\n");
 		exit(0);
-	}
-	
-	printf("\n\n");
-	exibir_mapa();
+	}	
+	printf("\n\n");	
 	if(flag)
 		fclose(arquivo);
 }
@@ -306,7 +301,7 @@ void criar_arquivo(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA]){
 	fclose(arquivo);
 }
 
-void __imprime_mapa_linha(char hor, char vert, int x){
+void __imprime_mapa_linha(char hor, char vert, int x){	
 	int i;
 	for(i = 0; i < (TAM_MAPA * x) + TAM_MAPA + 1; i++){
 		printf("%c", (i % TAM_MAPA) ? hor : vert);
@@ -320,7 +315,7 @@ void imprime_mapa(char mapa[TAM_MAPA][TAM_MAPA]){
 	char vert = ':', hor = '-';
 	int bit;
 
-	char simbolos[7] = {' ', 'B', 'F', 'P', 'W', 'R', 'J'};
+	char simbolos[7][10] = {" ", "\033[1;34mB", "\033[1;35mF", "\033[0;34mP", "\033[1;31mW", "\033[01;33mR", "\033[1;32mJ"};
 	
 	__imprime_mapa_linha(hor, vert, x);
 	for(i=0; i<TAM_MAPA; i++){
@@ -329,7 +324,7 @@ void imprime_mapa(char mapa[TAM_MAPA][TAM_MAPA]){
 			for(j=0; j<TAM_MAPA; j++){
 				for(k=0; k<x; k++){
 					bit = k + (l*x);
-					printf("%c", simbolos[ (bit+1) * verifica_estado(mapa, i, j, 1 << bit) ]);
+					printf("%s\033[0m", simbolos[ (bit+1) * verifica_estado(mapa, i, j, 1 << bit) ]);
 				}
 				printf("%c", vert);
 			}
@@ -338,4 +333,30 @@ void imprime_mapa(char mapa[TAM_MAPA][TAM_MAPA]){
 		__imprime_mapa_linha(hor, vert, x);
 	}
 	printf("\n");
+}
+
+void adicionar_estado(char mapa[TAM_MAPA][TAM_MAPA], 
+			int x, int y, ESTADO estado){
+		
+	if(x > 0)
+		mapa[y][x-1] &= ~estado;
+	if(x < TAM_MAPA)
+		mapa[y][x+1] &= ~estado;
+	if(y > 0)
+		mapa[y-1][x] &= ~estado;
+	if(y < TAM_MAPA)
+		mapa[y+1][x] &= ~estado;
+}
+
+void retirar_estado(char mapa[TAM_MAPA][TAM_MAPA], 
+			int x, int y, ESTADO estado){
+		
+	if(x > 0 && !verifica_estado(mapa,y,x-1,CONHECIDO))
+		mapa[y][x-1] |= estado;
+	if(x < TAM_MAPA && !verifica_estado(mapa,y,x+1,CONHECIDO))
+		mapa[y][x+1] |= estado;
+	if(y > 0 && !verifica_estado(mapa,y-1,x,CONHECIDO))
+		mapa[y-1][x] |= estado;
+	if(y < TAM_MAPA && !verifica_estado(mapa,y+1,x,CONHECIDO))
+		mapa[y+1][x] |= estado;
 }
