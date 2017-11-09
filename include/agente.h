@@ -14,11 +14,13 @@
 #define MODULO(x) ((x)>=0?(x):-(x))
 
 typedef enum{
-	ANDAR, ATIRAR, PEGAR
+    
+    ANDAR, ATIRAR, PEGAR
 }ACAO;
 
 typedef enum{
-	NORTE, LESTE, SUL, OESTE
+    
+    NORTE, LESTE, SUL, OESTE
 }SENTIDO;
 
 typedef struct s_Personagem{

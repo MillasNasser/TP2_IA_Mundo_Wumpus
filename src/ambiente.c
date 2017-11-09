@@ -13,6 +13,11 @@ void gera_mapa(){
 }
 
 int verifica_estado(char mapa[TAM_MAPA][TAM_MAPA], int x, int y, ESTADO estado){
+	
+	if(x < 0 || x > TAM_MAPA || y < 0 || y > TAM_MAPA){
+		
+		return 0;
+	}
 	return ((mapa[x][y] & (estado)) == estado);
 }
 
