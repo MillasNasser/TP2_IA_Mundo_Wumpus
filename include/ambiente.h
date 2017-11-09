@@ -4,11 +4,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "agente.h"
+typedef enum{
+	
+    BRISA=1, FEDOR=2, POCO=4, WUMPUS=8, 
+    RELUSENTE=16, CONHECIDO=32, 
+    VISITADO=64, JOGADOR=128            
+}ESTADO;
 
-/*typedef enum{
-	BRISA=1, POCO=2, FEDOR=4, WUMPUS=8, RELUSENTE=16, JOGADOR=32
-}ESTADO;*/
+#define TAM_MAPA 4
 
 char mapa[TAM_MAPA][TAM_MAPA];
 

@@ -22,8 +22,8 @@ void pontuar(int pontos){
     player.pontos += pontos;    
 }
 
-void mover(SENTIDO sentido){
-        
+void andar(SENTIDO sentido){
+    
     /* if que torna o ato de mover e 
      * e rotacionar atômico, rotacionando 
      * o player caso este não esteja na posição 
@@ -32,39 +32,40 @@ void mover(SENTIDO sentido){
      * pela função gera_acao. (descarta também o 
      * uso de memória.
     */
-    if(sentido != player.direcao){
-	
 	rotacionar(sentido);
-    }
+	
     switch(player.direcao){
 	
-	case NORTE:
-	    player.y--;
-	    break;
-	case LESTE:
-	    player.x++;
-	    break;
-	case SUL:
-	    player.y++;
-	    break;
-	case OESTE:
-	    player.x--;
-	    break;
-    }
-    pontuar(-1);    
+		case NORTE:
+			player.y--;
+			break;
+		case LESTE:
+			player.x++;
+			break;
+		case SUL:
+			player.y++;
+			break;
+		case OESTE:
+			player.x--;
+			break;
+	}
+	pontuar(-1);    
 }
 
 void rotacionar(SENTIDO newSentido){
     
-    if(MODULO(player.direcao - newSentido) == 2){
-	// Se for preciso movimento de 180° 
-	// penalizr o agente em 2 pontos.
-	pontuar(-2);
-    }else{	
-	// se nao penalizar o agente em 1.
-	pontuar(-1);
-    }
-    player.direcao = newSentido;    
+	if(newSentido != player.direcao){
+			    
+		if(MODULO(player.direcao - newSentido) == 2){
+			// Se for preciso movimento de 180° 
+			// penalizr o agente em 2 pontos.
+			pontuar(-2);
+		}else{	
+			// se nao penalizar o agente em 1.
+			pontuar(-1);
+		}
+		player.direcao = newSentido;    
+	}
 }
 
 // Função para alterar a pontuação do agente ao pegar o ouro.
@@ -83,18 +84,39 @@ void pegarOuro(){
     pontuar(PREMIUM);
 }
 
-void atirarFlecha(){
 
-    /*   
-     * Falta definir como será a alteração do mapa
-     * (remoção de ouro e também do wumpus).
-     * A inclusão do cabeçalho ambiente.h neste modulo pode
-     * ser realizada para que o mapa seja visível ao
-     * jogador (aparentemente o módulo ambiente não esta uti-
-     * -lizando recursos do módulo agente.h), 
-     * porém o header agente.h já esta incluso
-     * no header ambiente.h
-     */
+
+void atirarFlecha(SENTIDO sentido){
+	
+	if(!player.flecha){
+		
+		return;
+	}
+	int wumpus;
+    rotacionar(sentido);	
+	switch(sentido){
+		
+		case NORTE:
+			wumpus = verifica_estado(mapa, 
+				player.y - 1, player.x, WUMPUS);
+			
+			break;
+		case SUL:
+			wumpus = verifica_estado(mapa, 
+				player.y + 1, player.x, WUMPUS);
+			break;
+		case LESTE:
+			wumpus = verifica_estado(mapa, 
+				player.y, player.x + 1, WUMPUS);
+			break;
+		case OESTE:
+			wumpus = verifica_estado(mapa, 
+				player.y, player.x - 1, WUMPUS);
+			break;
+		default:
+			break;
+	}
+	if(mapa
     pontuar(THROW_ARROW);
 }
 
@@ -102,23 +124,19 @@ void agir(ACAO acao, SENTIDO sentido){
 	
     switch(acao){
 	
-	/*case ROTATE:
-	    rotacionar(sentido);
-	    break;		*/
-	case ANDAR:
-	    mover(sentido);
-	    break;                
-	case ATIRAR:
+		case ANDAR:
+			andar(sentido);
+			break;                
+		case ATIRAR:
+			break;               
+		case PEGAR:
+			pegarOuro();
+			break;
 
-	    break;               
-	case PEGAR:
-	    pegarOuro();
-	    break;
-
-	default :
-	    /*tratamento de erro*/
-	    break;
-    }
+		default :
+			/*tratamento de erro*/
+			break;
+		}
 }
 
 void imprime_mundo_conhecido(){

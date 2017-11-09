@@ -1,10 +1,9 @@
 #ifndef _AGENTE_H_
 #define _AGENTE_H_
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "ambiente.h"
 
-#define TAM_MAPA 4
+
 // define o pontuação caso o agente encontre o 
 // ouro.
 #define PREMIUM 10000
@@ -14,10 +13,6 @@
 // Macro para obter o módulo de uma operação.
 #define MODULO(x) ((x)>=0?(x):-(x))
 
-extern int verifica_estado();
-
-extern char mapa[TAM_MAPA][TAM_MAPA];
-
 typedef enum{
 	ANDAR, ATIRAR, PEGAR
 }ACAO;
@@ -26,16 +21,14 @@ typedef enum{
 	NORTE, LESTE, SUL, OESTE
 }SENTIDO;
 
-typedef enum{
-	BRISA=1, FEDOR=2, POCO=4, WUMPUS=8, RELUSENTE=16, CONHECIDO=32, VISITADO=64, JOGADOR=128
-}ESTADO;
-
 typedef struct s_Personagem{
-	int x,y;
-	int contador_movimento;
+    
+    int x,y;
+    int contador_movimento;
     int pontos;
-	SENTIDO direcao;
-	char mundo_conhecido[TAM_MAPA][TAM_MAPA];
+    int flecha;
+    SENTIDO direcao;
+    char mundo_conhecido[TAM_MAPA][TAM_MAPA];
 }Personagem;
 
 Personagem player;
@@ -53,7 +46,7 @@ void pontuar(int pontos);
 
 /*TO-DO: (Altera as "coordenadas" x e y do agente)
  * realiza a movimentação do agente e aplica penalização.*/
-void mover(SENTIDO sentido);
+void andar(SENTIDO sentido);
 
 void inicializa_jogador();
 
