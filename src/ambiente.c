@@ -336,20 +336,6 @@ void imprime_mapa(char mapa[TAM_MAPA][TAM_MAPA]){
 
 void adicionar_estado(char mapa[TAM_MAPA][TAM_MAPA], 
 			int x, int y, ESTADO estado){
-		
-	if(x > 0)
-		mapa[y][x-1] &= ~estado;
-	if(x < TAM_MAPA)
-		mapa[y][x+1] &= ~estado;
-	if(y > 0)
-		mapa[y-1][x] &= ~estado;
-	if(y < TAM_MAPA)
-		mapa[y+1][x] &= ~estado;
-}
-
-void retirar_estado(char mapa[TAM_MAPA][TAM_MAPA], 
-			int x, int y, ESTADO estado){
-		
 	if(x > 0 && !verifica_estado(mapa,y,x-1,CONHECIDO))
 		mapa[y][x-1] |= estado;
 	if(x < TAM_MAPA && !verifica_estado(mapa,y,x+1,CONHECIDO))
@@ -358,4 +344,16 @@ void retirar_estado(char mapa[TAM_MAPA][TAM_MAPA],
 		mapa[y-1][x] |= estado;
 	if(y < TAM_MAPA && !verifica_estado(mapa,y+1,x,CONHECIDO))
 		mapa[y+1][x] |= estado;
+}
+
+void retirar_estado(char mapa[TAM_MAPA][TAM_MAPA], 
+			int x, int y, ESTADO estado){
+	if(x > 0)
+		mapa[y][x-1] &= ~estado;
+	if(x < TAM_MAPA)
+		mapa[y][x+1] &= ~estado;
+	if(y > 0)
+		mapa[y-1][x] &= ~estado;
+	if(y < TAM_MAPA)
+		mapa[y+1][x] &= ~estado;
 }
