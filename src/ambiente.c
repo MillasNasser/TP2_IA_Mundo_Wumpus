@@ -128,7 +128,7 @@ void gerar_mapa(char *nome_arquivo){
 	do{
 		ouro_linha = rand() % 4;
 		ouro_coluna = rand() % 4;
-	}while(mapa_arquivo[ouro_linha][ouro_coluna] != '-' && verificar_redor_inicial_jogador(ouro_linha, ouro_coluna));
+	}while(mapa_arquivo[ouro_linha][ouro_coluna] != '-' || !verificar_redor_inicial_jogador(ouro_linha, ouro_coluna));
 	mapa_arquivo[ouro_linha][ouro_coluna] = 'R';
 
 	//Gerando as posições dos poços. Sempre serão gerados 3 poços.
@@ -164,7 +164,8 @@ void gerar_mapa(char *nome_arquivo){
 	do{
 		wumpus_linha = rand() % 4;
 		wumpus_coluna = rand() % 4;
-	}while(mapa_arquivo[wumpus_linha][wumpus_coluna] != '-' && mapa_arquivo[wumpus_linha][wumpus_coluna] != 'P');
+	}while((mapa_arquivo[wumpus_linha][wumpus_coluna] != '-' && mapa_arquivo[wumpus_linha][wumpus_coluna] != 'P') ||
+		!verificar_redor_inicial_jogador(wumpus_linha, wumpus_coluna));
 	if(mapa_arquivo[wumpus_linha][wumpus_coluna] == 'P'){
 		mapa_arquivo[wumpus_linha][wumpus_coluna] = 'D';
 	}else{
