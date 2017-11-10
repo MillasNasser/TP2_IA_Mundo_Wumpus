@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#define TODOS_ESTADOS -1
+
 typedef enum{
 	
     BRISA=1, 

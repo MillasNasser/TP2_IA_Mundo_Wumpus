@@ -118,11 +118,10 @@ void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag
 
 int verifica_estado(char mapa[TAM_MAPA][TAM_MAPA], int x, int y, ESTADO estado){
 	
-	if(x < 0 || x > TAM_MAPA || y < 0 || y > TAM_MAPA){
-		
-		return 0;
+	if(y >= 0 && y < 4 && x >=0 && x < 4){
+		return ((mapa[x][y] & (estado)) == estado);
 	}
-	return ((mapa[x][y] & (estado)) == estado);
+	return 0;
 }
 
 void iniciar_mapa(){

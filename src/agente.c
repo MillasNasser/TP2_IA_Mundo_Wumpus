@@ -1,5 +1,7 @@
 #include "agente.h"
 
+char salva_retorno[16] = {0};
+
 void __preenche_mundo_conhecido(int valor){
 	int i,j;
 	for(i=0; i < TAM_MAPA; i++){
@@ -11,12 +13,12 @@ void __preenche_mundo_conhecido(int valor){
 }
 
 void inicializa_jogador(){
-	
 	__preenche_mundo_conhecido(0);
+	player.direcao = NORTE;
 	player.mundo_conhecido[3][0] = JOGADOR;
-	player.y = 3; player.x = 0;	    
+	player.y = 3; player.x = 0;
 	mapa[3][0] = JOGADOR;
-	player.pontos = 0; // definindo pontuação inicial
+    player.pontos = 0; // definindo pontuação inicial
 }					   // para teste.
 
 void pontuar(int pontos){
@@ -93,8 +95,8 @@ void atirarFlecha(SENTIDO sentido){
 		default:
 			break;
 	}
-	if(verifica_estado(mapa, y, x, WUMPUS)){		
-		
+	if(verifica_estado(mapa, y, x, WUMPUS)){	
+
 		retirar_estado(mapa, x, y, WUMPUS);
 	}
     pontuar(THROW_ARROW);
@@ -123,6 +125,38 @@ void imprime_mundo_conhecido(){
 	imprime_mapa(player.mundo_conhecido);
 }
 
+/*Remove suposições a estados que estão adjacentes à posição que o agente está*/
+/*TO-DO: Não alterar estados que são visitados*/
+void ag_retirar_estado(ESTADO estado){
+	int x = player.x;
+	int y = player.y;
+	/*Estados adjacentes*/
+	if(x > 0 ) //OESTE
+		player.mundo_conhecido[y][x-1] &= ~estado;
+	if(x < TAM_MAPA) //LESTE
+		player.mundo_conhecido[y][x+1] &= ~estado;
+	if(y > 0) //NORTE
+		player.mundo_conhecido[y-1][x] &= ~estado;
+	if(y < TAM_MAPA) //SUL
+		player.mundo_conhecido[y+1][x] &= ~estado;
+}
+
+/*Adiciona suposições a estados que estão adjacentes à posição que o agente está*/
+/*TO-DO: Não alterar estados que são visitados*/
+void ag_adicionar_estado(ESTADO estado){
+	int x = player.x;
+	int y = player.y;
+	/*Estados adjacentes*/
+	if(x > 0 && !verifica_estado(player.mundo_conhecido,y,x-1,CONHECIDO|VISITADO))//OESTE
+		player.mundo_conhecido[y][x-1] |= estado;
+	if(x < TAM_MAPA && !verifica_estado(player.mundo_conhecido,y,x+1,CONHECIDO|VISITADO))//LESTE
+		player.mundo_conhecido[y][x+1] |= estado;
+	if(y > 0 && !verifica_estado(player.mundo_conhecido,y-1,x,CONHECIDO|VISITADO))//NORTE
+		player.mundo_conhecido[y-1][x] |= estado;
+	if(y < TAM_MAPA && !verifica_estado(player.mundo_conhecido,y+1,x,CONHECIDO|VISITADO))//SUL
+		player.mundo_conhecido[y+1][x] |= estado;
+}
+
 /*Define as respectivas suposições em relação a posição a que o agente está presente*/
 int marcar_estados_adj(){
 	int estado = 0;
@@ -132,12 +166,12 @@ int marcar_estados_adj(){
 	//Verifica se na posição possui brisa ou fedor
 	for(estado = 1; estado < 4; estado*=2){
 		//Se não houver retire dos que estão em volta
-		if(!verifica_estado(player.mundo_conhecido, y, x, estado)){
-			retirar_estado(player.mundo_conhecido, x, y, estado * 4);
-			adicionar_estado(player.mundo_conhecido, x, y, CONHECIDO);
+		if(!verifica_estado(player.mundo_conhecido,y,x,estado)){
+			ag_retirar_estado(estado * 4);
+			ag_adicionar_estado(CONHECIDO);
 		//Se houver verifica se não foi retirado
 		}else{
-			adicionar_estado(player.mundo_conhecido, x, y,estado * 4);
+			ag_adicionar_estado(estado * 4);
 		}
 	}
 	return 1;
@@ -146,15 +180,16 @@ int marcar_estados_adj(){
 /*Sempre inicia no 0 o nivel da função, logo passe apenas 0*/
 ACAO gera_acao(int nivel){
 	int i,j;
-	int livre = 0,
-		wumpus = 0,
-		poco = 0;
+	int livre = 0, wumpus = 0, poco = 0;
+	int pai_x = 1, pai_y = 1;
 
 	int x = player.x,
 		y = player.y;
 
+	//Pega todos os atributos da posição atual
 	player.mundo_conhecido[player.y][player.x] = 
 			mapa[player.y][player.x];
+
 	/* Se a posição do agente não foi visitado, a define
 	 * como visitado */
 	if(!verifica_estado(player.mundo_conhecido,y,x,VISITADO)){
@@ -162,16 +197,43 @@ ACAO gera_acao(int nivel){
 		player.mundo_conhecido[y][x] |= VISITADO;
 	}
 
+	marcar_estados_adj();
+
+	///Adicionando a matriz que faz a manutenção no estado
+	char matriz_estado[3][TAM_MAPA]= {{0}};
+
+	///Se o nivel for diferente de 0, indica que ele tem pai
 	if(nivel != 0){
-		
+		//Captura o sentido do jogador
+		switch(player.direcao){
+			case NORTE: pai_y =-1; pai_x = 0;	break;
+			case LESTE: pai_y = 0; pai_x = 1;	break;
+			case SUL:   pai_y = 1; pai_x = 0;	break;
+			case OESTE: pai_y = 0; pai_x =-1;	break;
+		}
+		matriz_estado[0][livre++] = (y+pai_y)*10+(x+pai_x);///Captura o pai 
 	}
 
-	char matriz_estado[3][TAM_MAPA]= {{0}};
+	/*Monta a matriz com as possibilidades de movimento*/
 	for(i = -1; i <= 1; i++){
 		for(j = -1; j <= 1; j++){
-			if(i==j || i+j == 0) continue;
-			if()
+			if(i==j || i+j == 0 || (i == pai_y && j == pai_x)) continue;
+			printf("%d %d: %d\n",(y+i), (x+j),(y+i)*10 + (x+j));
+			if(verifica_estado(player.mundo_conhecido,y+i,x+j, WUMPUS)){
+				matriz_estado[1][wumpus++] = (y+i)*10 + (x+j);
+			}else if(verifica_estado(player.mundo_conhecido,y+i,x+j, POCO)){
+				matriz_estado[2][poco++] = (y+i)*10 + (x+j);
+			}else if(verifica_estado(player.mundo_conhecido,y+i,x+j,TODOS_ESTADOS)){
+				matriz_estado[0][livre++] = (y+i)*10 + (x+j);
+			}
 		}
+	}printf("\n");
+
+	for(i = 0; i < 3; i++){
+		printf("%d: ",i);
+		for(j = 0; j < 4; j++){
+			printf("%d ",matriz_estado[i][j]);
+		}printf("\n");
 	}
 
 	return 0;

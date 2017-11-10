@@ -41,8 +41,6 @@ typedef struct s_Personagem{
 
 Personagem player;
 
-char salva_retorno[16] = {0};
-
 extern int verifica_estado();
 
 extern char mapa[TAM_MAPA][TAM_MAPA];
@@ -52,7 +50,13 @@ extern char mapa[TAM_MAPA][TAM_MAPA];
 void agir(ACAO acao, SENTIDO direcao);
 
 /*Define a ação que o agente irá tomar*/
-ACAO gera_acao();
+ACAO gera_acao(int nivel);
+
+int marcar_estados_adj();
+
+void ag_retirar_estado(ESTADO estado);
+
+void ag_adicionar_estado(ESTADO estado);
 
 /*TO-DO: Altera o atributo pontos do agente. 
  * (similar a um set).*/
