@@ -7,18 +7,17 @@
 
 #define TODOS_ESTADOS -1
 
-typedef enum{
-	
-    BRISA=1, 
-    FEDOR=2, 
-    POCO=4, 
-    WUMPUS=8, 
-    RELUSENTE=16, 
-    JOGADOR=32,
-    CONHECIDO=64, 
-    VISITADO=128 
-              
-}ESTADO;
+typedef enum ESTADO{
+	BRISA = 1,
+	FEDOR = 2,
+	POCO = 4,
+	WUMPUS = 8,
+	RELUSENTE = 16,
+	JOGADOR = 32,
+	CONHECIDO = 64,
+	VISITADO = 128
+
+} ESTADO;
 
 #define TAM_MAPA 4
 
@@ -28,7 +27,7 @@ char mapa[TAM_MAPA][TAM_MAPA];
 void gerar_mapa(char *nome_arquivo);
 
 //Verificar se a posição escolhida está em volta da posição inicial do jogador. Se não estiver, retorna 1.
-int verificar_redor_inicial_jogador(int jogador_x, int jogador_y, int posicao_x, int posicao_y);
+int verificar_redor_inicial_jogador(int linha, int coluna);
 
 //Criar o arquivo do mapa gerado aleatoriamente.
 void criar_arquivo(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA]);
@@ -43,29 +42,25 @@ void iniciar_mapa();
 void iniciar_mapa_arquivo(char matriz[TAM_MAPA][TAM_MAPA]);
 
 //Aplica nas casas adjacentes a presença de um poço (brisa) ou wumpus (fedor).
-void somar_rastros(char valor, int posicao_x, int posicao_y);
-
-int verificar_mapa_valido();
+void somar_rastros(char valor, int linha, int coluna);
 
 //Verifica se as posições escolhidas para os poços possibilitam pelo menos uma solução para o jogador.
-int verificar_solucao_possivel_mapa(int posicao_x, int posicao_y, char matriz[TAM_MAPA][TAM_MAPA]);
+int verificar_solucao_possivel_mapa(int linha, int coluna, char matriz[TAM_MAPA][TAM_MAPA]);
 
-//TO-DO 1: precisa saber em qual matriz olhar.
-//TO-DO 2: ver se for um ou todos (OR ou AND) os estados da máscara.
 /**
  * Verifica se estado está presente na matriz.
  * @param mapa global ou mundo conhecido do jogador
- * @param x linha da matriz
- * @param y coluna da matriz
+ * @param linha linha da matriz
+ * @param coluna coluna da matriz
  * @param estado máscara de bit correspondente ao(s) estado(s) desejado(s).
  * @return 1 se um dos estados da máscara estiver presente.
  */
-int verifica_estado(char mapa[TAM_MAPA][TAM_MAPA], int x, int y, ESTADO estado);
+int verifica_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado);
 
 void imprime_mapa(char mapa[TAM_MAPA][TAM_MAPA]);
 
-void adicionar_estado(char mapa[TAM_MAPA][TAM_MAPA], int x, int y, ESTADO estado);
+void adicionar_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado);
 
-void retirar_estado(char mapa[TAM_MAPA][TAM_MAPA], int x, int y, ESTADO estado);
+void retirar_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado);
 
 #endif /*_AMBIENTE_H_*/

@@ -19,25 +19,23 @@
 #define matri_x(v_vect) v_vect%TAM_MAPA 
 #define matri_y(v_vect) v_vect/TAM_MAPA
 
-typedef enum{
-    
-    ANDAR, ATIRAR, PEGAR
-}ACAO;
+typedef enum ACAO{
+	ANDAR, ATIRAR, PEGAR
+} ACAO;
 
-typedef enum{
-    
-    NORTE, LESTE, SUL, OESTE
-}SENTIDO;
+typedef enum SENTIDO{
+	NORTE, LESTE, SUL, OESTE
+} SENTIDO;
 
-typedef struct s_Personagem{
-    
-    int x,y;
-    int contador_movimento;
-    int pontos;
-    int flecha;
-    SENTIDO direcao;
-    char mundo_conhecido[TAM_MAPA][TAM_MAPA];
-}Personagem;
+typedef struct Personagem{
+	int linha;
+	int coluna;
+	int contador_movimento;
+	int pontos;
+	int flecha;
+	SENTIDO direcao;
+	char mundo_conhecido[TAM_MAPA][TAM_MAPA];
+} Personagem;
 
 Personagem player;
 
