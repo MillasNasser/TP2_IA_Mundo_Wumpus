@@ -23,6 +23,13 @@ typedef enum ESTADO{
 
 char mapa[TAM_MAPA][TAM_MAPA];
 
+/**
+ * Inicializa um mapa com o valor dado.
+ * @param mapa mapa global ou mundo conhecido do jogador
+ * @param valor valor inicial de todas as posições do mapa
+ */
+void iniciar_mapa(char mapa[TAM_MAPA][TAM_MAPA], char valor);
+
 //Gerar o mapa aleatoriamente.
 void gerar_mapa(char *nome_arquivo);
 
@@ -34,12 +41,6 @@ void criar_arquivo(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA]);
 
 //Carrega o mapa do arquivo ou por parâmetro (foi gerado aleatoriamente). Verifica por erros no arquivo e inicia o mapa com todos os status corretos em cada posição.
 void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag);
-
-//Inicia todas as posições do mapa com 0;
-void iniciar_mapa();
-
-//Inicia todas as posições do mapa temporário com ' - '.
-void iniciar_mapa_arquivo(char matriz[TAM_MAPA][TAM_MAPA]);
 
 //Verifica se as posições escolhidas para os poços possibilitam pelo menos uma solução para o jogador.
 int verificar_solucao_possivel_mapa(int linha, int coluna, char matriz[TAM_MAPA][TAM_MAPA]);

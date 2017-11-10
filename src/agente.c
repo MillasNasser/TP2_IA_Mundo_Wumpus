@@ -2,18 +2,9 @@
 
 char salva_retorno[16] = {0};
 
-void __preenche_mundo_conhecido(int valor){
-	int i, j;
-	for(i = 0; i < TAM_MAPA; i++){
-		for(j = 0; j < TAM_MAPA; j++){
-			player.mundo_conhecido[i][j] = valor;
-		}
-	}
-	player.mundo_conhecido[TAM_MAPA - 1][0] = mapa[TAM_MAPA - 1][0];
-}
-
 void inicializa_jogador(){
-	__preenche_mundo_conhecido(0);
+	iniciar_mapa(player.mundo_conhecido, 0);
+	player.mundo_conhecido[TAM_MAPA - 1][0] = mapa[TAM_MAPA - 1][0];
 	player.direcao = NORTE;
 	player.mundo_conhecido[TAM_MAPA - 1][0] = JOGADOR;
 	player.linha = TAM_MAPA - 1;

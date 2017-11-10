@@ -1,7 +1,16 @@
 #include "ambiente.h"
 
+void iniciar_mapa(char mapa[TAM_MAPA][TAM_MAPA], char valor){
+	int i, j;
+	for(i = 0; i < TAM_MAPA; i++){
+		for(j = 0; j < TAM_MAPA; j++){
+			mapa[i][j] = valor;
+		}
+	}
+}
+
 void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag){
-	iniciar_mapa();
+	iniciar_mapa(mapa, 0);
 	FILE *arquivo;
 	//Flag = 1: O mapa é carregado do arquivo. Flag = 0: O mapa foi gerado aleatoriamente e passado por parâmetro.
 	if(flag){
@@ -106,28 +115,9 @@ void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag
 		fclose(arquivo);
 }
 
-
-void iniciar_mapa(){
-	int i, j;
-	for(i = 0; i < TAM_MAPA; i++){
-		for(j = 0; j < TAM_MAPA; j++){
-			mapa[i][j] = 0;
-		}
-	}
-}
-
-void iniciar_mapa_arquivo(char matriz[TAM_MAPA][TAM_MAPA]){
-	int i, j;
-	for(i = 0; i < TAM_MAPA; i++){
-		for(j = 0; j < TAM_MAPA; j++){
-			matriz[i][j] = '-';
-		}
-	}
-}
-
 void gerar_mapa(char *nome_arquivo){
 	char mapa_arquivo[TAM_MAPA][TAM_MAPA];
-	iniciar_mapa_arquivo(mapa_arquivo);
+	iniciar_mapa(mapa_arquivo, '-');
 
 	//Escolhendo a posição inicial do jogador.
 	int jogador_linha = TAM_MAPA - 1, jogador_coluna = 0;
