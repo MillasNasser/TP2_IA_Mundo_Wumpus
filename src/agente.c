@@ -100,7 +100,7 @@ void atirarFlecha(SENTIDO sentido){
 	}
 	if(verifica_estado(mapa, linha, coluna, WUMPUS)){
 
-		retirar_estado(mapa, linha, coluna, WUMPUS);
+		remover_estado(mapa, linha, coluna, WUMPUS);
 	}
 	pontuar(THROW_ARROW);
 }

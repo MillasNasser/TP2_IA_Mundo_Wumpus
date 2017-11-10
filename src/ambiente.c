@@ -27,9 +27,9 @@ void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag
 				{
 					if(!wumpus_iniciado){
 						if(quantidade_pocos < 3){
-							mapa[linha][coluna] |= WUMPUS + POCO;
-							somar_rastros(FEDOR, linha, coluna);
-							somar_rastros(BRISA, linha, coluna);
+							adicionar_estado(mapa, linha, coluna, WUMPUS + POCO);
+							adicionar_estados_adjacentes(mapa, linha, coluna, FEDOR);
+							adicionar_estados_adjacentes(mapa, linha, coluna, BRISA);
 							wumpus_iniciado = 1;
 							quantidade_pocos++;
 						}else{
@@ -45,8 +45,8 @@ void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag
 				case 'W':
 				{
 					if(!wumpus_iniciado){
-						mapa[linha][coluna] |= WUMPUS;
-						somar_rastros(FEDOR, linha, coluna);
+						adicionar_estado(mapa, linha, coluna, WUMPUS);
+						adicionar_estados_adjacentes(mapa, linha, coluna, FEDOR);
 						wumpus_iniciado = 1;
 					}else{
 						printf("O mapa só pode possuir um Wumpus.\n");
@@ -57,8 +57,8 @@ void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag
 				case 'P':
 				{
 					if(quantidade_pocos < 3){
-						mapa[linha][coluna] |= POCO;
-						somar_rastros(BRISA, linha, coluna);
+						adicionar_estado(mapa, linha, coluna, POCO);
+						adicionar_estados_adjacentes(mapa, linha, coluna, BRISA);
 						quantidade_pocos++;
 					}else{
 						printf("O mapa só pode possuir ate 3 pocos.\n");
@@ -69,7 +69,7 @@ void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag
 				case 'R':
 				{
 					if(!ouro_iniciado){
-						mapa[linha][coluna] |= RELUSENTE;
+						adicionar_estado(mapa, linha, coluna, RELUSENTE);
 						ouro_iniciado = 1;
 					}else{
 						printf("Erro: O mapa só pode possuir uma barra de ouro.\n");
@@ -78,26 +78,9 @@ void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag
 					break;
 				}
 				case 'J':
-				{
-					/*if(!jogador_iniciado){
-						if((posicao_y == 0 || posicao_y == TAM_MAPA-1) && (posicao_x == 0 || posicao_x == TAM_MAPA-1)){
-							
-							inicializa_jogador(posicao_y,posicao_x);
-							jogador_iniciado=1;
-						}else{
-							printf("Erro: O jogador só pode iniciar nas posicoes dos extremos do mapa.\n");
-							exit(0);
-						}
-					}else{
-						printf("Erro: O jogador só pode iniciar em uma posicao, apenas.\n");
-						exit(0);
-					}*/
 					break;
-				}
 				case '-':
-				{
 					break;
-				}
 				default:
 				{
 					printf("\nCaracter invalido encontrado no arquivo:'%c'.\n", estado);
@@ -123,12 +106,6 @@ void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag
 		fclose(arquivo);
 }
 
-int verifica_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado){
-	if(coluna >= 0 && coluna < 4 && linha >= 0 && linha < 4){
-		return((mapa[linha][coluna] & (estado)) == estado);
-	}
-	return 0;
-}
 
 void iniciar_mapa(){
 	int i, j;
@@ -146,20 +123,6 @@ void iniciar_mapa_arquivo(char matriz[TAM_MAPA][TAM_MAPA]){
 			matriz[i][j] = '-';
 		}
 	}
-}
-
-void somar_rastros(char valor, int linha, int coluna){
-	if(coluna - 1 >= 0)//Esquerda
-		mapa[linha][coluna - 1] |= valor;
-
-	if(linha - 1 >= 0)//Cima
-		mapa[linha - 1][coluna] |= valor;
-
-	if(coluna + 1 < TAM_MAPA)//Direita
-		mapa[linha][coluna + 1] |= valor;
-
-	if(linha + 1 < TAM_MAPA)//Baixo
-		mapa[linha + 1][coluna] |= valor;
 }
 
 void gerar_mapa(char *nome_arquivo){
@@ -301,6 +264,13 @@ void criar_arquivo(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA]){
 	fclose(arquivo);
 }
 
+int verifica_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado){
+	if(coluna >= 0 && coluna < 4 && linha >= 0 && linha < 4){
+		return((mapa[linha][coluna] & (estado)) == estado);
+	}
+	return 0;
+}
+
 void __imprime_mapa_linha(char hor, char vert, int x){
 	int i;
 	for(i = 0; i < (TAM_MAPA * x) + TAM_MAPA + 1; i++){
@@ -322,7 +292,6 @@ void imprime_mapa(char mapa[TAM_MAPA][TAM_MAPA]){
 		for(l = 0; l < y; l++){
 			printf("%c", vert);
 			for(j = 0; j < TAM_MAPA; j++){
-				c = mapa[i][j];
 				for(k = 0; k < x; k++){
 					bit = k + (l * x);
 					printf("%s\033[0m", simbolos[ (bit + 1) * verifica_estado(mapa, i, j, 1 << bit) ]);
@@ -337,23 +306,27 @@ void imprime_mapa(char mapa[TAM_MAPA][TAM_MAPA]){
 }
 
 void adicionar_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado){
-	if(coluna > 0 && !verifica_estado(mapa, linha, coluna - 1, CONHECIDO))
-		mapa[linha][coluna - 1] |= estado;
-	if(coluna < TAM_MAPA && !verifica_estado(mapa, linha, coluna + 1, CONHECIDO))
-		mapa[linha][coluna + 1] |= estado;
-	if(linha > 0 && !verifica_estado(mapa, linha - 1, coluna, CONHECIDO))
-		mapa[linha - 1][coluna] |= estado;
-	if(linha < TAM_MAPA && !verifica_estado(mapa, linha + 1, coluna, CONHECIDO))
-		mapa[linha + 1][coluna] |= estado;
+	if(linha >=0 && linha < TAM_MAPA && coluna >= 0 && coluna < TAM_MAPA && !verifica_estado(mapa, linha, coluna - 1, CONHECIDO)){
+		mapa[linha][coluna] |= estado;
+	}
 }
 
-void retirar_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado){
-	if(coluna > 0)
-		mapa[linha][coluna - 1] &= ~estado;
-	if(coluna < TAM_MAPA)
-		mapa[linha][coluna + 1] &= ~estado;
-	if(linha > 0)
-		mapa[linha - 1][coluna] &= ~estado;
-	if(linha < TAM_MAPA)
-		mapa[linha + 1][coluna] &= ~estado;
+void remover_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado){
+	if(linha >=0 && linha < TAM_MAPA && coluna >= 0 && coluna < TAM_MAPA){
+		mapa[linha][coluna] &= ~estado;
+	}
+}
+
+void adicionar_estados_adjacentes(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado){
+	adicionar_estado(mapa, linha-1, coluna, estado);
+	adicionar_estado(mapa, linha+1, coluna, estado);
+	adicionar_estado(mapa, linha, coluna-1, estado);
+	adicionar_estado(mapa, linha, coluna+1, estado);
+}
+
+void remover_estados_adjacentes(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado){
+	remover_estado(mapa, linha-1, coluna, estado);
+	remover_estado(mapa, linha+1, coluna, estado);
+	remover_estado(mapa, linha, coluna-1, estado);
+	remover_estado(mapa, linha, coluna+1, estado);
 }

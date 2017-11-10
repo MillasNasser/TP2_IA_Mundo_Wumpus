@@ -41,9 +41,6 @@ void iniciar_mapa();
 //Inicia todas as posições do mapa temporário com ' - '.
 void iniciar_mapa_arquivo(char matriz[TAM_MAPA][TAM_MAPA]);
 
-//Aplica nas casas adjacentes a presença de um poço (brisa) ou wumpus (fedor).
-void somar_rastros(char valor, int linha, int coluna);
-
 //Verifica se as posições escolhidas para os poços possibilitam pelo menos uma solução para o jogador.
 int verificar_solucao_possivel_mapa(int linha, int coluna, char matriz[TAM_MAPA][TAM_MAPA]);
 
@@ -61,6 +58,10 @@ void imprime_mapa(char mapa[TAM_MAPA][TAM_MAPA]);
 
 void adicionar_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado);
 
-void retirar_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado);
+void remover_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado);
+
+void adicionar_estados_adjacentes(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado);
+
+void remover_estados_adjacentes(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado);
 
 #endif /*_AMBIENTE_H_*/
