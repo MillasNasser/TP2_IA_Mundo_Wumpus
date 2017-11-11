@@ -13,10 +13,11 @@ int main(int argc,char **argv){
 	}		
 	inicializa_jogador();
 	imprime_mapa(mapa);
-	exit(0);
+	//exit(0);
 	while(!verifica_estado(mapa, player.coluna, player.linha, RELUSENTE)){
 			
-		gera_acao(0);		
+		gera_acao(0);
+		return 0;
 	}
 	return 0;
 }

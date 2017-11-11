@@ -196,8 +196,7 @@ ACAO gera_acao(int nivel){
 	marcar_estados_adj();
 
 	//Adicionando a matriz que faz a manutenção no estado
-	char matriz_estado[3][TAM_MAPA] = {
-		{0}};
+	char matriz_estado[3][TAM_MAPA] = {{0}};
 
 	//Se o nivel for diferente de 0, indica que ele tem pai
 	if(nivel != 0){
@@ -228,11 +227,11 @@ ACAO gera_acao(int nivel){
 		for(j = -1; j <= 1; j++){
 			if(i == j || i + j == 0 || (i == pai_linha && j == pai_coluna)) continue;
 			printf("%d %d: %d\n", (linha + i), (coluna + j), (linha + i)*10 + (coluna + j));
-			if(verifica_estado(player.mundo_conhecido, linha + i, coluna + j, WUMPUS)){
+			if(verifica_estado(player.mundo_conhecido, linha + i, coluna + j, player.mundo_conhecido[linha + i][coluna + j] | WUMPUS)){
 				matriz_estado[1][wumpus++] = (linha + i)*10 + (coluna + j);
-			}else if(verifica_estado(player.mundo_conhecido, linha + i, coluna + j, POCO)){
+			}else if(verifica_estado(player.mundo_conhecido, linha + i, coluna + j, player.mundo_conhecido[linha + i][coluna + j] | POCO)){
 				matriz_estado[2][poco++] = (linha + i)*10 + (coluna + j);
-			}else if(verifica_estado(player.mundo_conhecido, linha + i, coluna + j, TODOS_ESTADOS)){
+			}else if(verifica_estado(player.mundo_conhecido, linha + i, coluna + j, player.mundo_conhecido[linha + i][coluna + j])){
 				matriz_estado[0][livre++] = (linha + i)*10 + (coluna + j);
 			}
 		}
@@ -242,7 +241,7 @@ ACAO gera_acao(int nivel){
 	for(i = 0; i < 3; i++){
 		printf("%d: ", i);
 		for(j = 0; j < 4; j++){
-			printf("%d ", matriz_estado[i][j]);
+			printf("%02d ", matriz_estado[i][j]);
 		}
 		printf("\n");
 	}
