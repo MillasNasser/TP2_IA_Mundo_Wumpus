@@ -3,7 +3,7 @@
 int main(int argc,char **argv){
 			
 	srand( (unsigned)time(NULL) );
-	if(argv[1] != NULL){
+	if(argc > 1){
 		
 		char matriz[TAM_MAPA][TAM_MAPA];
 		carregar_mapa(argv[1],matriz,1);
@@ -14,9 +14,14 @@ int main(int argc,char **argv){
 	inicializa_jogador();
 	imprime_mapa(mapa);
 	//exit(0);
+	char pai[TAM_MAPA * TAM_MAPA];
+	int i;
+	for(i=0; i<TAM_MAPA * TAM_MAPA; i++){
+		pai[i] = -1;
+	}
 	while(!verifica_estado(mapa, player.coluna, player.linha, RELUSENTE)){
-			
-		gera_acao(0);
+		
+		gera_acao(pai, 1);
 		return 0;
 	}
 	return 0;

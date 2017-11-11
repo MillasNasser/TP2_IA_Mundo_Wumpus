@@ -5,9 +5,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define TODOS_ESTADOS -1
-
 typedef enum ESTADO{
+	TODOS_ESTADOS = 0,
 	BRISA = 1,
 	FEDOR = 2,
 	POCO = 4,

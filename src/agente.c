@@ -4,12 +4,11 @@ char salva_retorno[16] = {0};
 
 void inicializa_jogador(){
 	iniciar_mapa(player.mundo_conhecido, 0);
-	player.mundo_conhecido[TAM_MAPA - 1][0] = mapa[TAM_MAPA - 1][0];
+	mapa[TAM_MAPA - 1][0] |= (JOGADOR | VISITADO) ;
+	player.mundo_conhecido[TAM_MAPA - 1][0] = mapa[TAM_MAPA - 1][0] | CONHECIDO;
 	player.direcao = NORTE;
-	player.mundo_conhecido[TAM_MAPA - 1][0] = JOGADOR;
 	player.linha = TAM_MAPA - 1;
 	player.coluna = 0;
-	mapa[TAM_MAPA-1][0] = JOGADOR;
 	player.pontos = 0; // definindo pontuação inicial.
 }
 
@@ -20,6 +19,9 @@ void pontuar(int pontos){
 
 void andar(SENTIDO sentido){
 
+	remover_estado(mapa, player.linha, player.coluna, JOGADOR);
+	remover_estado(player.mundo_conhecido, player.linha, player.coluna, JOGADOR);
+	
 	rotacionar(sentido);
 	switch(player.direcao){
 
@@ -37,6 +39,16 @@ void andar(SENTIDO sentido){
 			break;
 	}
 	pontuar(-1);
+	
+	adicionar_estado(mapa, player.linha, player.coluna, JOGADOR);
+	adicionar_estado(mapa, player.linha, player.coluna, VISITADO);
+
+	//Pega todos os atributos da posição atual
+	player.mundo_conhecido[player.linha][player.coluna] =
+		mapa[player.linha][player.coluna];
+	
+	player.mundo_conhecido[player.linha][player.coluna] |= CONHECIDO;
+
 }
 
 void rotacionar(SENTIDO newSentido){
@@ -60,6 +72,10 @@ void rotacionar(SENTIDO newSentido){
 void pegarOuro(){
 
 	pontuar(PREMIUM);
+
+	//TO-DO: melhorar isso.
+	printf("Fim de jogo\n");
+	exit(0);
 }
 
 void atirarFlecha(SENTIDO sentido){
@@ -117,6 +133,7 @@ void agir(ACAO acao, SENTIDO sentido){
 
 void imprime_mundo_conhecido(){
 	imprime_mapa(player.mundo_conhecido);
+	printf("Posicao: (%d, %d)\n", player.linha, player.coluna);
 }
 
 /*Remove suposições a estados que estão adjacentes à posição que o agente está*/
@@ -173,77 +190,214 @@ int marcar_estados_adj(){
 	return 1;
 }
 
-/*Sempre inicia no 0 o nivel da função, logo passe apenas 0*/
-ACAO gera_acao(int nivel){
+SENTIDO converte_hash_para_sentido(char hash){
+	char hash_jogador = hash(player.linha, player.coluna);
+	
+	switch(hash - hash_jogador){
+		case -10:
+			return NORTE;
+		case 10:
+			return SUL;
+		case 1:
+			return LESTE;
+		case -1:
+			return OESTE;
+		default:
+			printf("converte_hash_para_sentido: erro\n");
+			exit(0);
+	}
+}
+
+void pm(char matriz_estado[3][TAM_MAPA]){
 	int i, j;
+	for(i=0; i<3; i++){
+		for(j=0; j<TAM_MAPA; j++){
+			printf("%02d ", matriz_estado[i][j]);
+		}
+		printf("\n");
+	}
+}
+
+/*Sempre inicia no 0 o nivel da função, logo passe apenas 0*/
+int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
+	int i, j, k;
 	int livre = 0, wumpus = 0, poco = 0;
-	int pai_coluna = 1, pai_linha = 1;
+	char hash_novo;
+	char hash_player = hash(player.linha, player.coluna);
+	int retorno;
 
-	int linha = player.linha;
-	int coluna = player.coluna;
-
-	//Pega todos os atributos da posição atual
-	player.mundo_conhecido[player.linha][player.coluna] =
-		mapa[player.linha][player.coluna];
-
-	/* Se a posição do agente não foi visitada, a define
-	 * como visitado */
-	if(!verifica_estado(player.mundo_conhecido, linha, coluna, VISITADO)){
-		player.mundo_conhecido[linha][coluna] &= ~CONHECIDO; //Isso aqui não pode existir.
-		player.mundo_conhecido[linha][coluna] |= VISITADO;
+	if(verifica_estado(mapa, player.linha, player.coluna, RELUSENTE)){
+		agir(PEGAR, -1);
+	}else if(verifica_estado(mapa, player.linha, player.coluna, POCO)){
+		//TO-DO
+		printf("Perdeu\n");
+		exit(0);
 	}
 
 	marcar_estados_adj();
 
 	//Adicionando a matriz que faz a manutenção no estado
-	char matriz_estado[3][TAM_MAPA] = {{0}};
-
-	//Se o nivel for diferente de 0, indica que ele tem pai
-	if(nivel != 0){
-		//Captura o sentido do jogador
-		switch(player.direcao){
-			case NORTE:
-				pai_linha = -1;
-				pai_coluna = 0;
-				break;
-			case LESTE:
-				pai_linha = 0;
-				pai_coluna = 1;
-				break;
-			case SUL:
-				pai_linha = 1;
-				pai_coluna = 0;
-				break;
-			case OESTE:
-				pai_linha = 0;
-				pai_coluna = -1;
-				break;
+	char matriz_estado[3][TAM_MAPA];
+	
+	for(i=0; i<3; i++){
+		for(j=0; j<TAM_MAPA; j++){
+			matriz_estado[i][j] = -1;
 		}
-		matriz_estado[0][livre++] = (linha + pai_linha) * 10 + (coluna + pai_coluna); //Captura o pai 
 	}
 
+	//Encontrando o último pai.
+	char ultimo_pai;
+	for(k = 0; k < TAM_MAPA * TAM_MAPA && pai[k] != -1; k++);
+	ultimo_pai = k - 1;
+
+	imprime_mapa(mapa);
+	imprime_mundo_conhecido();
+	
+	printf("Ultimo: %s\n", ultimo?"sim":"nao");
+	printf("Pai: %d\n", pai[ultimo_pai]);
+	
 	/*Monta a matriz com as possibilidades de movimento*/
 	for(i = -1; i <= 1; i++){
 		for(j = -1; j <= 1; j++){
-			if(i == j || i + j == 0 || (i == pai_linha && j == pai_coluna)) continue;
-			printf("%d %d: %d\n", (linha + i), (coluna + j), (linha + i)*10 + (coluna + j));
-			if(verifica_estado(player.mundo_conhecido, linha + i, coluna + j, player.mundo_conhecido[linha + i][coluna + j] | WUMPUS)){
-				matriz_estado[1][wumpus++] = (linha + i)*10 + (coluna + j);
-			}else if(verifica_estado(player.mundo_conhecido, linha + i, coluna + j, player.mundo_conhecido[linha + i][coluna + j] | POCO)){
-				matriz_estado[2][poco++] = (linha + i)*10 + (coluna + j);
-			}else if(verifica_estado(player.mundo_conhecido, linha + i, coluna + j, player.mundo_conhecido[linha + i][coluna + j])){
-				matriz_estado[0][livre++] = (linha + i)*10 + (coluna + j);
+			
+			if(i == j || i + j == 0){
+				goto fim;
 			}
+
+			//hash_novo = (linha + i) * 10 + coluna + j;
+			hash_novo = hash(player.linha + i, player.coluna + j);
+
+			//Verifica se o movimento não está na lista de pais.
+			for(k = 0; k < TAM_MAPA * TAM_MAPA && pai[k] != -1; k++){
+				if(k < 0 || hash_novo == pai[k]){
+					goto fim;
+				}
+			}
+
+			//printf("%d %d: %d\n", (linha + i), (coluna + j), hash_novo);
+			if(verifica_estado(player.mundo_conhecido, player.linha + i, player.coluna + j, WUMPUS)){
+				matriz_estado[1][wumpus++] = hash_novo;
+			}else if(verifica_estado(player.mundo_conhecido, player.linha + i, player.coluna + j, POCO)){
+				matriz_estado[2][poco++] = hash_novo;
+			}else if(verifica_estado(player.mundo_conhecido, player.linha + i, player.coluna + j, TODOS_ESTADOS)){
+				matriz_estado[0][livre++] = hash_novo;
+			}
+			fim:;
 		}
 	}
-	printf("\n");
+	
+	//getchar();
+	//exit(0);
 
+	SENTIDO sentido;
+	//Percorre Matriz.
 	for(i = 0; i < 3; i++){
-		printf("%d: ", i);
-		for(j = 0; j < 4; j++){
-			printf("%02d ", matriz_estado[i][j]);
+		for(j = 0; j < TAM_MAPA; j++){
+			hash_novo = matriz_estado[i][j];
+			
+			if(hash_novo == -1){
+				continue;
+			}
+			
+			printf("---------------------------\n");
+			printf("%d (%d, %d)\nMAPA GLOBAL:\n", ultimo_pai, i, j);
+			imprime_mapa(mapa);
+			printf("MUNDO CONHECIDO\n");
+			imprime_mundo_conhecido();
+			printf("Ultimo: %s\n", ultimo?"sim":"nao");
+			printf("Pai: %d\n", pai[ultimo_pai]);
+			pm(matriz_estado);
+			
+			sentido = converte_hash_para_sentido(hash_novo);
+
+			//Ainda tem estados livres.
+			if(i == 0 && j < livre){
+				agir(ANDAR, sentido);
+			}else{
+				if(i == 0){
+					i++;
+				}
+				//Verifica se tem wumpus.
+				if(i == 1 && j < wumpus){
+					if(ultimo){
+						int offset_linha = player.linha;
+						int offset_coluna = player.coluna;
+						switch(sentido){
+							case NORTE:
+								offset_linha--;
+								break;
+							case SUL:
+								offset_linha++;
+								break;
+							case LESTE:
+								offset_coluna++;
+								break;
+							case OESTE:
+								offset_coluna--;
+								break;
+						}
+						if(verifica_estado(player.mundo_conhecido, offset_linha, offset_coluna, WUMPUS)){
+							agir(ATIRAR, sentido);
+
+							//Atualizando matriz.
+							matriz_estado[0][livre++] = hash_novo;
+							matriz_estado[1][--wumpus] = -1;
+							i = 0;
+							j = livre - 2;
+						}else{
+							agir(ANDAR, sentido);
+						}
+					}else{
+						//Volta o movimento.
+
+						sentido = converte_hash_para_sentido(pai[ultimo_pai]);
+						agir(ANDAR, sentido);
+						pai[ultimo_pai] = -1;
+						return 1;
+					}
+				}else{
+					if(i == 1){
+						i++;
+					}
+					if(i == 2){
+						//Só tem poço.
+						if(ultimo){
+							sentido = converte_hash_para_sentido(rand() % poco);
+							agir(ANDAR, sentido);
+
+							//TO-DO: talvez atualizar a matriz.
+
+						}else{
+							//Volta o movimento.
+
+							sentido = converte_hash_para_sentido(pai[ultimo_pai]);
+							agir(ANDAR, sentido);
+							pai[ultimo_pai] = -1;
+							return 0;
+						}
+					}
+				}
+			}
+
+			//Adiciona a si próprio na lista de pais.
+			pai[ultimo_pai + 1] = hash_player;
+
+			//Chama a recursão.
+			//TO-DO: consertar essa parte.
+			if(ultimo == 0 || (i == 0 && (j + 1 < livre || wumpus > 0))){
+				retorno = gera_acao(pai, 0);
+			}else{
+				retorno = gera_acao(pai, 1);
+			}
+			
+			if(retorno == 1){
+				//Atualizando matriz.
+				matriz_estado[1][wumpus++] = hash_novo;
+			}else{
+				//Atualizando matriz.
+				matriz_estado[2][poco++] = hash_novo;
+			}
 		}
-		printf("\n");
 	}
 
 	return 0;

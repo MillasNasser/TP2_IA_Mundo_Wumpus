@@ -293,11 +293,10 @@ void imprime_mapa(char mapa[TAM_MAPA][TAM_MAPA]){
 		}
 		__imprime_mapa_linha(hor, vert, x);
 	}
-	printf("\n");
 }
 
 void adicionar_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado){
-	if(linha >=0 && linha < TAM_MAPA && coluna >= 0 && coluna < TAM_MAPA && !verifica_estado(mapa, linha, coluna - 1, CONHECIDO)){
+	if(linha >=0 && linha < TAM_MAPA && coluna >= 0 && coluna < TAM_MAPA && !verifica_estado(mapa, linha, coluna, CONHECIDO)){
 		mapa[linha][coluna] |= estado;
 	}
 }

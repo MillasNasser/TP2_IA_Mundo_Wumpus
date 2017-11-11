@@ -1,0 +1,61 @@
+bool gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
+	if(tem ouro){
+		agir(PEGAR, NULL);
+	}else if(tem poço){
+		fim();
+	}
+	
+	marcar_estados_adj();
+	
+	montar_matriz();
+	
+	percorre matriz{
+		//atualizar_matriz(); 
+		sentido = converte_hash(movimento_livre);
+		if(tem estados livre){
+			agir(ANDAR, sentido);
+		}else{
+			if(tem wumpus){
+				if(ultimo == true){
+					if(verifica_estado(FEDOR)){
+						agir(ATIRAR, sentido);
+						atualizar_matriz();
+						//Alterar o i e o j aqui.
+					}else{
+						agir(ANDAR, converte_hash(cara_que_tem_wumps));
+					}
+				}else{
+					agir(ANDAR, converte_hash(pai)); //Anda p/ trás.
+					return true;
+				}
+			}else{
+				//Só tem poço.
+				if(ultimo == true){
+					poço = rand() % quantidade_de_poços;
+					sentido = converte_hash(poço);
+					agir(ANDAR, sentido);
+				}else{
+					agir(ANDAR, converte_hash(pai));
+					return false;
+				}
+			}
+		}
+		
+		//Chamar recursão.
+		if(ultimo == false){
+			retorno = gera_acao(meu_hash, false);
+		}else{
+			if(ainda_tem_movimentos_livres()){
+				retorno = gera_acao(meu_hash, false);
+			}else{
+				retorno = gera_acao(meu_hash, true);
+			}
+		}
+		if(retorno == true){
+			atualiza_matriz_wumpus();
+		}else{
+			atualiza_matriz_poço();
+		}
+	}
+	
+}
