@@ -13,11 +13,7 @@
 // Macro para obter o módulo de uma operação.
 #define MODULO(x) ((x)>=0?(x):-(x))
 
-//a é no formato ab (a,b): ous seja representar 20
-//é equivalente à (2,0)
-#define vetorizar(a) (a/10)*TAM_MAPA + (a%10)
-#define matri_x(v_vect) v_vect%TAM_MAPA 
-#define matri_y(v_vect) v_vect/TAM_MAPA
+#define hash(linha, coluna) ((linha) * 10) + (coluna)
 
 typedef enum ACAO{
 	ANDAR, ATIRAR, PEGAR
@@ -39,7 +35,7 @@ typedef struct Personagem{
 
 Personagem player;
 
-extern int verifica_estado();
+//extern int verifica_estado();
 
 extern char mapa[TAM_MAPA][TAM_MAPA];
 
@@ -48,7 +44,7 @@ extern char mapa[TAM_MAPA][TAM_MAPA];
 void agir(ACAO acao, SENTIDO direcao);
 
 /*Define a ação que o agente irá tomar*/
-ACAO gera_acao(int nivel);
+int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo);
 
 int marcar_estados_adj();
 
@@ -76,7 +72,7 @@ void pegarOuro();
 
 /*TO-DO: Remove o wumpus do mapa e aplica penalização
  * ao agente por atirar a flecha. (FLAG THROW_AXE)*/
-void atirarFlecha();
+void atirarFlecha(SENTIDO sentido);
 
 /*TO-DO: Identifica qual ação deve ser tomada (ROTATE, 
  * ANDAR, ATIRAR, PEGAR) e chama a função respectiva.*/
