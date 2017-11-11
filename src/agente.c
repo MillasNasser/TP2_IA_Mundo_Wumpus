@@ -10,6 +10,7 @@ void inicializa_jogador(){
 	player.linha = TAM_MAPA - 1;
 	player.coluna = 0;
 	player.pontos = 0; // definindo pontuação inicial.
+	player.flecha = 1;
 }
 
 void pontuar(int pontos){
@@ -108,6 +109,10 @@ void atirarFlecha(SENTIDO sentido){
 	if(verifica_estado(mapa, linha, coluna, WUMPUS)){
 
 		remover_estado(mapa, linha, coluna, WUMPUS);
+		remover_estados_adjacentes(mapa, linha, coluna, FEDOR);
+		
+		remover_estado(player.mundo_conhecido, linha, coluna, WUMPUS);
+		remover_estados_adjacentes(player.mundo_conhecido, linha, coluna, FEDOR);
 	}
 	pontuar(THROW_ARROW);
 }
@@ -120,6 +125,7 @@ void agir(ACAO acao, SENTIDO sentido){
 			andar(sentido);
 			break;
 		case ATIRAR:
+			atirarFlecha(sentido);
 			break;
 		case PEGAR:
 			pegarOuro();
@@ -313,6 +319,8 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 			//Ainda tem estados livres.
 			if(i == 0 && j < livre){
 				agir(ANDAR, sentido);
+				//Adiciona a si próprio na lista de pais.
+				pai[ultimo_pai + 1] = hash_player;
 			}else{
 				if(i == 0){
 					i++;
@@ -346,6 +354,8 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 							j = livre - 2;
 						}else{
 							agir(ANDAR, sentido);
+							//Adiciona a si próprio na lista de pais.
+							pai[ultimo_pai + 1] = hash_player;
 						}
 					}else{
 						//Volta o movimento.
@@ -366,6 +376,9 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 							agir(ANDAR, sentido);
 
 							//TO-DO: talvez atualizar a matriz.
+							
+							//Adiciona a si próprio na lista de pais.
+							pai[ultimo_pai + 1] = hash_player;
 
 						}else{
 							//Volta o movimento.
@@ -378,9 +391,6 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 					}
 				}
 			}
-
-			//Adiciona a si próprio na lista de pais.
-			pai[ultimo_pai + 1] = hash_player;
 
 			//Chama a recursão.
 			//TO-DO: consertar essa parte.

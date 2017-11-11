@@ -72,7 +72,7 @@ void pegarOuro();
 
 /*TO-DO: Remove o wumpus do mapa e aplica penalização
  * ao agente por atirar a flecha. (FLAG THROW_AXE)*/
-void atirarFlecha();
+void atirarFlecha(SENTIDO sentido);
 
 /*TO-DO: Identifica qual ação deve ser tomada (ROTATE, 
  * ANDAR, ATIRAR, PEGAR) e chama a função respectiva.*/
