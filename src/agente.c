@@ -151,11 +151,11 @@ void ag_retirar_estado(ESTADO estado){
 	/*Estados adjacentes*/
 	if(coluna > 0) //OESTE
 		player.mundo_conhecido[linha][coluna - 1] &= ~estado;
-	if(coluna < TAM_MAPA) //LESTE
+	if(coluna < TAM_MAPA - 1) //LESTE
 		player.mundo_conhecido[linha][coluna + 1] &= ~estado;
 	if(linha > 0) //NORTE
 		player.mundo_conhecido[linha - 1][coluna] &= ~estado;
-	if(linha < TAM_MAPA) //SUL
+	if(linha < TAM_MAPA - 1) //SUL
 		player.mundo_conhecido[linha + 1][coluna] &= ~estado;
 }
 
@@ -165,14 +165,26 @@ void ag_retirar_estado(ESTADO estado){
 void ag_adicionar_estado(ESTADO estado){
 	int linha = player.linha;
 	int coluna = player.coluna;
+	int v;
 	/*Estados adjacentes*/
-	if(coluna > 0 && !verifica_estado(player.mundo_conhecido, linha, coluna - 1, CONHECIDO | VISITADO))//OESTE
+	v = verifica_estado(player.mundo_conhecido, linha, coluna - 1, CONHECIDO) ||
+		verifica_estado(player.mundo_conhecido, linha, coluna - 1, VISITADO);
+	if(coluna > 0 && !v)//OESTE
 		player.mundo_conhecido[linha][coluna - 1] |= estado;
-	if(coluna < TAM_MAPA && !verifica_estado(player.mundo_conhecido, linha, coluna + 1, CONHECIDO | VISITADO))//LESTE
+	
+	v = verifica_estado(player.mundo_conhecido, linha, coluna + 1, CONHECIDO) ||
+		verifica_estado(player.mundo_conhecido, linha, coluna + 1, VISITADO);
+	if(coluna < TAM_MAPA - 1 && !v)//LESTE
 		player.mundo_conhecido[linha][coluna + 1] |= estado;
-	if(linha > 0 && !verifica_estado(player.mundo_conhecido, linha - 1, coluna, CONHECIDO | VISITADO))//NORTE
+	
+	v = verifica_estado(player.mundo_conhecido, linha - 1, coluna, CONHECIDO) ||
+		verifica_estado(player.mundo_conhecido, linha - 1, coluna, VISITADO);
+	if(linha > 0 && !v)//NORTE
 		player.mundo_conhecido[linha - 1][coluna] |= estado;
-	if(linha < TAM_MAPA && !verifica_estado(player.mundo_conhecido, linha + 1, coluna, CONHECIDO | VISITADO))//SUL
+	
+	v = verifica_estado(player.mundo_conhecido, linha + 1, coluna, CONHECIDO) ||
+		verifica_estado(player.mundo_conhecido, linha + 1, coluna, VISITADO);
+	if(linha < TAM_MAPA - 1 && !v)//SUL
 		player.mundo_conhecido[linha + 1][coluna] |= estado;
 }
 
@@ -187,12 +199,12 @@ int marcar_estados_adj(){
 		//Se não houver retire dos que estão em volta
 		if(!verifica_estado(player.mundo_conhecido, linha, coluna, estado)){
 			ag_retirar_estado(estado * 4);
-			ag_adicionar_estado(CONHECIDO);
 			//Se houver verifica se não foi retirado
 		}else{
-			ag_adicionar_estado(estado * 4);
+			ag_adicionar_estado((estado * 4));
 		}
 	}
+	ag_adicionar_estado(CONHECIDO);
 	return 1;
 }
 
@@ -295,6 +307,7 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 	//getchar();
 	//exit(0);
 
+	int esconde_bug;
 	SENTIDO sentido;
 	//Percorre Matriz.
 	for(i = 0; i < 3; i++){
@@ -305,6 +318,7 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 				continue;
 			}
 			
+			esconde_bug = 0;
 			printf("---------------------------\n");
 			printf("%d (%d, %d)\nMAPA GLOBAL:\n", ultimo_pai, i, j);
 			imprime_mapa(mapa);
@@ -346,12 +360,14 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 						}
 						if(verifica_estado(player.mundo_conhecido, offset_linha, offset_coluna, WUMPUS)){
 							agir(ATIRAR, sentido);
+							
 
 							//Atualizando matriz.
 							matriz_estado[0][livre++] = hash_novo;
 							matriz_estado[1][--wumpus] = -1;
 							i = 0;
 							j = livre - 2;
+							esconde_bug = 1;
 						}else{
 							agir(ANDAR, sentido);
 							//Adiciona a si próprio na lista de pais.
@@ -372,7 +388,7 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 					if(i == 2){
 						//Só tem poço.
 						if(ultimo){
-							sentido = converte_hash_para_sentido(rand() % poco);
+							sentido = converte_hash_para_sentido(matriz_estado[2][rand() % poco]);
 							agir(ANDAR, sentido);
 
 							//TO-DO: talvez atualizar a matriz.
@@ -394,7 +410,7 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 
 			//Chama a recursão.
 			//TO-DO: consertar essa parte.
-			if(ultimo == 0 || (i == 0 && (j + 1 < livre || wumpus > 0))){
+			if(ultimo == 0 || (i == 0 && (j + 1 + esconde_bug < livre || wumpus > 0))){
 				retorno = gera_acao(pai, 0);
 			}else{
 				retorno = gera_acao(pai, 1);
