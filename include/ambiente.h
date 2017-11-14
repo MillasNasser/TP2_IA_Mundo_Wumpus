@@ -1,6 +1,7 @@
 #ifndef _AMBIENTE_H_
 #define _AMBIENTE_H_
 
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>

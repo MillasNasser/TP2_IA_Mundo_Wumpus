@@ -1,7 +1,7 @@
 #include "agente.h"
 
 int main(int argc,char **argv){
-			
+	setlocale(LC_ALL, "");
 	srand( (unsigned)time(NULL) );
 	if(argc > 1){
 		

@@ -75,7 +75,7 @@ void pegarOuro(){
 	pontuar(PREMIUM);
 
 	//TO-DO: melhorar isso.
-	printf("Fim de jogo\n");
+	printf("Achou o Ouro! Fim de jogo\n");
 	exit(0);
 }
 
@@ -149,11 +149,43 @@ int marcar_estados_adj(){
 		//Se não houver retire dos que estão em volta
 		if(!verifica_estado(player.mundo_conhecido, linha, coluna, estado)){
 			remover_estados_adjacentes(player.mundo_conhecido, linha, coluna, estado * 4);
-			//ag_retirar_estado(estado * 4);
-			//Se houver verifica se não foi retirado
 		}else{
 			adicionar_estados_adjacentes(player.mundo_conhecido, linha, coluna, estado * 4, CONHECIDO);
-			//ag_adicionar_estado((estado * 4));
+			
+			/*
+			 * Como há somente 1 wumpus no mapa, caso o estado seja FEDOR, é
+			 * preciso remover todos os supostos wumpus que não estejam
+			 * adjacentes a algum fedor descoberto.
+			 */
+			if(estado == FEDOR){
+				int i, j;
+				for(i=0; i<TAM_MAPA; i++){
+					for(j=0; j<TAM_MAPA; j++){
+						if(verifica_estado(player.mundo_conhecido, i, j, WUMPUS)){
+							if(MODULO(i - linha) + MODULO(j - coluna) > 1){
+								printf("1- Wumpus em (%d, %d) não é adjacente ao fedor em (%d,%d)\n", i, j, linha, coluna);
+								remover_estado(player.mundo_conhecido, i, j, WUMPUS);
+							}
+						}
+						if(verifica_estado(player.mundo_conhecido, i, j, FEDOR)){
+							int k, l;
+							for(k=-1; k<=1; k++){
+								for(l=-1; l<=1; l++){
+									if(MODULO(k) + MODULO(l) == 1){
+										if(verifica_estado(player.mundo_conhecido, linha + k, coluna + l, WUMPUS)){
+											if(MODULO(i - (linha + k)) + MODULO(j - (coluna + l)) > 1){
+												printf("2- Wumpus em (%d, %d) não é adjacente ao fedor em (%d,%d)\n", linha+k, coluna+l, i, j);
+												remover_estado(player.mundo_conhecido, linha + k, coluna + l, WUMPUS);
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			
 		}
 	}
 	adicionar_estados_adjacentes(player.mundo_conhecido, linha, coluna, CONHECIDO, TODOS_ESTADOS);
@@ -188,7 +220,6 @@ void pm(char matriz_estado[3][TAM_MAPA]){
 	}
 }
 
-/*Sempre inicia no 0 o nivel da função, logo passe apenas 0*/
 int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 	int i, j, k;
 	int livre = 0, wumpus = 0, poco = 0;
@@ -203,8 +234,6 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 		printf("Caiu no poco\n");
 		exit(0);
 	}
-
-	marcar_estados_adj();
 
 	//Adicionando a matriz que faz a manutenção no estado
 	char matriz_estado[3][TAM_MAPA];
@@ -225,6 +254,8 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 	
 	printf("Ultimo: %s\n", ultimo?"sim":"nao");
 	printf("Pai: %d\n", pai[ultimo_pai]);
+	
+	marcar_estados_adj();
 	
 	/*Monta a matriz com as possibilidades de movimento*/
 	for(i = -1; i <= 1; i++){
