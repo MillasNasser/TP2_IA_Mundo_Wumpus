@@ -6,7 +6,8 @@
 #include <time.h>
 
 typedef enum ESTADO{
-	TODOS_ESTADOS = 0,
+	TODOS_ESTADOS = -1,
+	NENHUM_ESTADO = 0,
 	BRISA = 1,
 	FEDOR = 2,
 	POCO = 4,
@@ -15,7 +16,6 @@ typedef enum ESTADO{
 	JOGADOR = 32,
 	CONHECIDO = 64,
 	VISITADO = 128
-
 } ESTADO;
 
 #define TAM_MAPA 4
@@ -56,11 +56,11 @@ int verifica_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO
 
 void imprime_mapa(char mapa[TAM_MAPA][TAM_MAPA]);
 
-void adicionar_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado);
+void adicionar_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado, ESTADO condicao);
 
 void remover_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado);
 
-void adicionar_estados_adjacentes(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado);
+void adicionar_estados_adjacentes(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado, ESTADO condicao);
 
 void remover_estados_adjacentes(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado);
 

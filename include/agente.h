@@ -48,10 +48,6 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo);
 
 int marcar_estados_adj();
 
-void ag_retirar_estado(ESTADO estado);
-
-void ag_adicionar_estado(ESTADO estado);
-
 /*TO-DO: Altera o atributo pontos do agente. 
  * (similar a um set).*/
 void pontuar(int pontos);

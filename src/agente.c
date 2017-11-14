@@ -41,8 +41,8 @@ void andar(SENTIDO sentido){
 	}
 	pontuar(-1);
 	
-	adicionar_estado(mapa, player.linha, player.coluna, JOGADOR);
-	adicionar_estado(mapa, player.linha, player.coluna, VISITADO);
+	adicionar_estado(mapa, player.linha, player.coluna, JOGADOR, TODOS_ESTADOS);
+	adicionar_estado(mapa, player.linha, player.coluna, VISITADO, TODOS_ESTADOS);
 
 	//Pega todos os atributos da posição atual
 	player.mundo_conhecido[player.linha][player.coluna] =
@@ -142,52 +142,6 @@ void imprime_mundo_conhecido(){
 	printf("Posicao: (%d, %d)\n", player.linha, player.coluna);
 }
 
-/*Remove suposições a estados que estão adjacentes à posição que o agente está*/
-
-/*TO-DO: Não alterar estados que são visitados*/
-void ag_retirar_estado(ESTADO estado){
-	int linha = player.linha;
-	int coluna = player.coluna;
-	/*Estados adjacentes*/
-	if(coluna > 0) //OESTE
-		player.mundo_conhecido[linha][coluna - 1] &= ~estado;
-	if(coluna < TAM_MAPA - 1) //LESTE
-		player.mundo_conhecido[linha][coluna + 1] &= ~estado;
-	if(linha > 0) //NORTE
-		player.mundo_conhecido[linha - 1][coluna] &= ~estado;
-	if(linha < TAM_MAPA - 1) //SUL
-		player.mundo_conhecido[linha + 1][coluna] &= ~estado;
-}
-
-/*Adiciona suposições a estados que estão adjacentes à posição que o agente está*/
-
-/*TO-DO: Não alterar estados que são visitados*/
-void ag_adicionar_estado(ESTADO estado){
-	int linha = player.linha;
-	int coluna = player.coluna;
-	int v;
-	/*Estados adjacentes*/
-	v = verifica_estado(player.mundo_conhecido, linha, coluna - 1, CONHECIDO) ||
-		verifica_estado(player.mundo_conhecido, linha, coluna - 1, VISITADO);
-	if(coluna > 0 && !v)//OESTE
-		player.mundo_conhecido[linha][coluna - 1] |= estado;
-	
-	v = verifica_estado(player.mundo_conhecido, linha, coluna + 1, CONHECIDO) ||
-		verifica_estado(player.mundo_conhecido, linha, coluna + 1, VISITADO);
-	if(coluna < TAM_MAPA - 1 && !v)//LESTE
-		player.mundo_conhecido[linha][coluna + 1] |= estado;
-	
-	v = verifica_estado(player.mundo_conhecido, linha - 1, coluna, CONHECIDO) ||
-		verifica_estado(player.mundo_conhecido, linha - 1, coluna, VISITADO);
-	if(linha > 0 && !v)//NORTE
-		player.mundo_conhecido[linha - 1][coluna] |= estado;
-	
-	v = verifica_estado(player.mundo_conhecido, linha + 1, coluna, CONHECIDO) ||
-		verifica_estado(player.mundo_conhecido, linha + 1, coluna, VISITADO);
-	if(linha < TAM_MAPA - 1 && !v)//SUL
-		player.mundo_conhecido[linha + 1][coluna] |= estado;
-}
-
 /*Define as respectivas suposições em relação a posição a que o agente está presente*/
 int marcar_estados_adj(){
 	int estado = 0;
@@ -198,13 +152,15 @@ int marcar_estados_adj(){
 	for(estado = 1; estado < 4; estado *= 2){
 		//Se não houver retire dos que estão em volta
 		if(!verifica_estado(player.mundo_conhecido, linha, coluna, estado)){
-			ag_retirar_estado(estado * 4);
+			remover_estados_adjacentes(player.mundo_conhecido, linha, coluna, estado * 4);
+			//ag_retirar_estado(estado * 4);
 			//Se houver verifica se não foi retirado
 		}else{
-			ag_adicionar_estado((estado * 4));
+			adicionar_estados_adjacentes(player.mundo_conhecido, linha, coluna, estado * 4, CONHECIDO);
+			//ag_adicionar_estado((estado * 4));
 		}
 	}
-	ag_adicionar_estado(CONHECIDO);
+	adicionar_estados_adjacentes(player.mundo_conhecido, linha, coluna, CONHECIDO, TODOS_ESTADOS);
 	return 1;
 }
 
@@ -297,7 +253,7 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 				matriz_estado[1][wumpus++] = hash_novo;
 			}else if(verifica_estado(player.mundo_conhecido, player.linha + i, player.coluna + j, POCO)){
 				matriz_estado[2][poco++] = hash_novo;
-			}else if(verifica_estado(player.mundo_conhecido, player.linha + i, player.coluna + j, TODOS_ESTADOS)){
+			}else if(verifica_estado(player.mundo_conhecido, player.linha + i, player.coluna + j, NENHUM_ESTADO)){
 				matriz_estado[0][livre++] = hash_novo;
 			}
 			fim:;
