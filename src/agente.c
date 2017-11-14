@@ -80,11 +80,6 @@ void pegarOuro(){
 }
 
 void atirarFlecha(SENTIDO sentido){
-
-	if(!player.flecha){
-
-		return;
-	}
 	int linha = player.linha;
 	int coluna = player.coluna;
 	rotacionar(sentido);
@@ -111,9 +106,10 @@ void atirarFlecha(SENTIDO sentido){
 		remover_estado(mapa, linha, coluna, WUMPUS);
 		remover_estados_adjacentes(mapa, linha, coluna, FEDOR);
 		
-		remover_estado(player.mundo_conhecido, linha, coluna, WUMPUS);
 		remover_estados_adjacentes(player.mundo_conhecido, linha, coluna, FEDOR);
 	}
+	remover_estado(player.mundo_conhecido, linha, coluna, WUMPUS);
+	player.flecha--;
 	pontuar(THROW_ARROW);
 }
 
@@ -204,7 +200,7 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 		agir(PEGAR, -1);
 	}else if(verifica_estado(mapa, player.linha, player.coluna, POCO)){
 		//TO-DO
-		printf("Perdeu\n");
+		printf("Caiu no poco\n");
 		exit(0);
 	}
 
@@ -297,7 +293,7 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 				}
 				//Verifica se tem wumpus.
 				if(i == 1 && j < wumpus){
-					if(ultimo){
+					if(player.flecha > 0 && ultimo){
 						int offset_linha = player.linha;
 						int offset_coluna = player.coluna;
 						switch(sentido){
@@ -316,11 +312,11 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 						}
 						if(verifica_estado(player.mundo_conhecido, offset_linha, offset_coluna, WUMPUS)){
 							agir(ATIRAR, sentido);
-							
 
 							//Atualizando matriz.
 							matriz_estado[0][livre++] = hash_novo;
-							matriz_estado[1][--wumpus] = -1;
+							matriz_estado[1][j] = -1;
+							wumpus--;
 							i = 0;
 							j = livre - 2;
 							esconde_bug = 1;
@@ -366,7 +362,7 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 
 			//Chama a recursão.
 			//TO-DO: consertar essa parte.
-			if(ultimo == 0 || (i == 0 && (j + 1 + esconde_bug < livre || wumpus > 0))){
+			if(ultimo == 0 || (i == 0 && (j + 1 + esconde_bug < livre || (wumpus > 0 && player.flecha > 0)))){
 				retorno = gera_acao(pai, 0);
 			}else{
 				retorno = gera_acao(pai, 1);

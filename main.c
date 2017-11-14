@@ -19,10 +19,6 @@ int main(int argc,char **argv){
 	for(i=0; i<TAM_MAPA * TAM_MAPA; i++){
 		pai[i] = -1;
 	}
-	while(!verifica_estado(mapa, player.coluna, player.linha, RELUSENTE)){
-		
-		gera_acao(pai, 1);
-		return 0;
-	}
+	gera_acao(pai, 1);
 	return 0;
 }
