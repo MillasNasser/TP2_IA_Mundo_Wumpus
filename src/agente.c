@@ -1,6 +1,8 @@
 #include "agente.h"
 
-char salva_retorno[16] = {0};
+char ACAO_STR[3][10] = {"ANDAR", "ATIRAR", "PEGAR"};
+
+char SENTIDO_STR[5][10] = {"NORTE", "LESTE", "SUL", "OESTE", " "};
 
 void inicializa_jogador(){
 	iniciar_mapa(player.mundo_conhecido, 0);
@@ -114,9 +116,10 @@ void atirarFlecha(SENTIDO sentido){
 }
 
 void agir(ACAO acao, SENTIDO sentido){
-
+	
+	printf("Ação: %s %s", ACAO_STR[acao], (sentido < 4)?SENTIDO_STR[sentido]:SENTIDO_STR[5]);
+	//getchar();
 	switch(acao){
-
 		case ANDAR:
 			andar(sentido);
 			break;
@@ -226,34 +229,41 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 	char hash_novo;
 	char hash_player = hash(player.linha, player.coluna);
 	int retorno;
-
-	if(verifica_estado(mapa, player.linha, player.coluna, RELUSENTE)){
-		agir(PEGAR, -1);
-	}else if(verifica_estado(mapa, player.linha, player.coluna, POCO)){
-		//TO-DO
-		printf("Caiu no poco\n");
-		exit(0);
-	}
-
-	//Adicionando a matriz que faz a manutenção no estado
-	char matriz_estado[3][TAM_MAPA];
 	
+	//Encontrando o último pai.
+	char ultimo_pai;
+	printf("Caminho:");
+	for(k = 0; k < TAM_MAPA * TAM_MAPA && pai[k] != -1; k++){
+		printf(" %02d", pai[k]);
+	}
+	ultimo_pai = k - 1;
+	
+	//Criando a matriz de movimentos.
+	char matriz_estado[3][TAM_MAPA];
 	for(i=0; i<3; i++){
 		for(j=0; j<TAM_MAPA; j++){
 			matriz_estado[i][j] = -1;
 		}
 	}
-
-	//Encontrando o último pai.
-	char ultimo_pai;
-	for(k = 0; k < TAM_MAPA * TAM_MAPA && pai[k] != -1; k++);
-	ultimo_pai = k - 1;
-
-	imprime_mapa(mapa);
-	imprime_mundo_conhecido();
 	
-	printf("Ultimo: %s\n", ultimo?"sim":"nao");
+	printf("\n---=== Início ===---\n");
+	printf("MAPA GLOBAL:\n");
+	imprime_mapa(mapa);
+	printf("MUNDO CONHECIDO\n");
+	imprime_mundo_conhecido();
+	printf("Último: %s\n", ultimo?"sim":"não");
 	printf("Pai: %d\n", pai[ultimo_pai]);
+	pm(matriz_estado);
+	//getchar();
+
+	if(verifica_estado(mapa, player.linha, player.coluna, RELUSENTE)){
+		//printf("Ação: PEGAR\n");
+		agir(PEGAR, -1);
+	}else if(verifica_estado(mapa, player.linha, player.coluna, POCO)){
+		//TO-DO
+		printf("Caiu no poço\n");
+		exit(0);
+	}
 	
 	marcar_estados_adj();
 	
@@ -265,7 +275,6 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 				goto fim;
 			}
 
-			//hash_novo = (linha + i) * 10 + coluna + j;
 			hash_novo = hash(player.linha + i, player.coluna + j);
 
 			//Verifica se o movimento não está na lista de pais.
@@ -275,7 +284,6 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 				}
 			}
 
-			//printf("%d %d: %d\n", (linha + i), (coluna + j), hash_novo);
 			if(verifica_estado(player.mundo_conhecido, player.linha + i, player.coluna + j, WUMPUS)){
 				matriz_estado[1][wumpus++] = hash_novo;
 			}else if(verifica_estado(player.mundo_conhecido, player.linha + i, player.coluna + j, POCO)){
@@ -286,9 +294,6 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 			fim:;
 		}
 	}
-	
-	//getchar();
-	//exit(0);
 
 	int esconde_bug;
 	SENTIDO sentido;
@@ -301,13 +306,18 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 				continue;
 			}
 			
+			//TO-DO: Talvez colocar esse if como um OR no if acima.
+			/*if(verifica_estado(player.mundo_conhecido, hash_novo / 10, hash_novo % 10, VISITADO)){
+				continue;
+			}*/
+			
 			esconde_bug = 0;
-			printf("---------------------------\n");
-			printf("%d (%d, %d)\nMAPA GLOBAL:\n", ultimo_pai, i, j);
+			printf("---=== Antes da ação ===---\n");
+			printf("MAPA GLOBAL:\n");
 			imprime_mapa(mapa);
 			printf("MUNDO CONHECIDO\n");
 			imprime_mundo_conhecido();
-			printf("Ultimo: %s\n", ultimo?"sim":"nao");
+			printf("Último: %s\n", ultimo?"sim":"não");
 			printf("Pai: %d\n", pai[ultimo_pai]);
 			pm(matriz_estado);
 			
@@ -315,6 +325,7 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 
 			//Ainda tem estados livres.
 			if(i == 0 && j < livre){
+				//printf("Ação: ANDAR ");
 				agir(ANDAR, sentido);
 				//Adiciona a si próprio na lista de pais.
 				pai[ultimo_pai + 1] = hash_player;
@@ -342,6 +353,7 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 								break;
 						}
 						if(verifica_estado(player.mundo_conhecido, offset_linha, offset_coluna, WUMPUS)){
+							//printf("Ação: ATIRAR %s\n", )
 							agir(ATIRAR, sentido);
 
 							//Atualizando matriz.
@@ -390,6 +402,15 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 					}
 				}
 			}
+			
+			printf("---=== Depois da ação ===---\n");
+			printf("MAPA GLOBAL:\n");
+			imprime_mapa(mapa);
+			printf("MUNDO CONHECIDO\n");
+			imprime_mundo_conhecido();
+			printf("Último: %s\n", ultimo?"sim":"não");
+			printf("Pai: %d\n", pai[ultimo_pai]);
+			pm(matriz_estado);
 
 			//Chama a recursão.
 			//TO-DO: consertar essa parte.

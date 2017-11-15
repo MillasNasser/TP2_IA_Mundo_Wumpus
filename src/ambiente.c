@@ -30,7 +30,6 @@ void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag
 			}else{
 				estado = matriz[linha][coluna];
 			}
-			printf("%c", estado);
 			switch(estado){
 				case 'D':
 				{
@@ -99,18 +98,15 @@ void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag
 			if(coluna + 1 < TAM_MAPA){
 				if(flag)
 					fscanf(arquivo, " ");
-				printf(" ");
 			}
 		}
 		if(flag)
 			fscanf(arquivo, "\n");
-		printf("\n");
 	}
 	if(!ouro_iniciado){
 		printf("\nO mapa nao possui nenhum ouro!\n");
 		exit(0);
 	}
-	printf("\n\n");
 	if(flag)
 		fclose(arquivo);
 }
@@ -278,9 +274,26 @@ void imprime_mapa(char mapa[TAM_MAPA][TAM_MAPA]){
 
 	char simbolos[7][10] = {" ", "\033[1;34mB", "\033[1;35mF", "\033[0;34mP", "\033[1;31mW", "\033[01;33mR", "\033[1;32mJ"};
 	
+	printf(" ");
+	for(i=0; i<TAM_MAPA; i++){
+		printf(" ");
+		for(j=0; j<x/2; j++){
+			printf(" ");
+		}
+		printf("%d", i);
+		for(j=0; j<x/2; j++){
+			printf(" ");
+		}
+	}
+	printf("\n ");
 	__imprime_mapa_linha(hor, vert, x);
 	for(i = 0; i < TAM_MAPA; i++){
 		for(l = 0; l < y; l++){
+			if(l == 0){
+				printf("%d", i);
+			}else{
+				printf(" ");
+			}
 			printf("%c", vert);
 			for(j = 0; j < TAM_MAPA; j++){
 				for(k = 0; k < x; k++){
@@ -291,6 +304,7 @@ void imprime_mapa(char mapa[TAM_MAPA][TAM_MAPA]){
 			}
 			printf("\n");
 		}
+		printf(" ");
 		__imprime_mapa_linha(hor, vert, x);
 	}
 }
