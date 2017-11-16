@@ -209,6 +209,7 @@ SENTIDO converte_hash_para_sentido(char hash){
 			return OESTE;
 		default:
 			printf("converte_hash_para_sentido: erro\n");
+			mapa[258963][555555] = LESTE;
 			exit(0);
 	}
 }
@@ -267,6 +268,8 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 	
 	marcar_estados_adj();
 	
+	printf("#####%d %d %d#####\n", hash_player, player.linha, player.coluna);
+	
 	/*Monta a matriz com as possibilidades de movimento*/
 	for(i = -1; i <= 1; i++){
 		for(j = -1; j <= 1; j++){
@@ -279,17 +282,20 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 
 			//Verifica se o movimento não está na lista de pais.
 			for(k = 0; k < TAM_MAPA * TAM_MAPA && pai[k] != -1; k++){
-				if(k < 0 || hash_novo == pai[k]){
+				if(hash_novo == pai[k]){
 					goto fim;
 				}
 			}
 
 			if(verifica_estado(player.mundo_conhecido, player.linha + i, player.coluna + j, WUMPUS)){
 				matriz_estado[1][wumpus++] = hash_novo;
+				printf("add[%d][%d]: %d WUMPUS\n",1,wumpus-1,hash_novo);
 			}else if(verifica_estado(player.mundo_conhecido, player.linha + i, player.coluna + j, POCO)){
 				matriz_estado[2][poco++] = hash_novo;
+				printf("add[%d][%d]: %d POÇO\n",2,poco-1,hash_novo);
 			}else if(verifica_estado(player.mundo_conhecido, player.linha + i, player.coluna + j, NENHUM_ESTADO)){
 				matriz_estado[0][livre++] = hash_novo;
+				printf("add[%d][%d]: %d LIVRE\n",0,livre-1,hash_novo);
 			}
 			fim:;
 		}
@@ -320,6 +326,10 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 			printf("Último: %s\n", ultimo?"sim":"não");
 			printf("Pai: %d\n", pai[ultimo_pai]);
 			pm(matriz_estado);
+			
+			for(int k = 0; pai[k] != -1; k++){
+				printf("%d ",pai[k]);
+			}printf("\n");
 			
 			sentido = converte_hash_para_sentido(hash_novo);
 
@@ -423,12 +433,23 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 			if(retorno == 1){
 				//Atualizando matriz.
 				matriz_estado[1][wumpus++] = hash_novo;
-			}else{
+			}else if(retorno == 0){
 				//Atualizando matriz.
 				matriz_estado[2][poco++] = hash_novo;
+			}else{
+				
+				for(int k = 0; pai[k] != -1; k++){
+					printf("%d ",pai[k]);
+				}printf("\n");
+				
+				printf("Ultimo pai[%d]: %d %d%d :: %d\n", ultimo_pai,pai[ultimo_pai],player.linha,player.coluna,hash_player);
+				sentido = converte_hash_para_sentido(pai[ultimo_pai+1]);
+				agir(ANDAR, sentido);
 			}
 		}
 	}
 
-	return 0;
+	//pai[ultimo_pai] = -1;
+	printf("SAFADO!!!!\n");
+	return -1;
 }
