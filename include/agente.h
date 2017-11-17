@@ -80,4 +80,6 @@ void agir(ACAO acao, SENTIDO sentido);
  */
 void imprime_mundo_conhecido();
 
+void finaliza(const char *mensagem);
+
 #endif /*_AGENTE_H_*/

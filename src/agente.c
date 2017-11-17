@@ -75,10 +75,7 @@ void rotacionar(SENTIDO newSentido){
 void pegarOuro(){
 
 	pontuar(PREMIUM);
-
-	//TO-DO: melhorar isso.
-	printf("Achou o Ouro! Fim de jogo\n");
-	exit(0);
+	finaliza("Achou o Ouro! Fim de jogo");
 }
 
 void atirarFlecha(SENTIDO sentido){
@@ -130,7 +127,7 @@ void agir(ACAO acao, SENTIDO sentido){
 			pegarOuro();
 			break;
 		default:
-			/*tratamento de erro*/
+			finaliza("Não fui programado para agir desse jeito");
 			break;
 	}
 }
@@ -207,9 +204,9 @@ SENTIDO converte_hash_para_sentido(char hash){
 		case -1:
 			return OESTE;
 		default:
-			printf("converte_hash_para_sentido: %d não é adjacente à %d\n", hash_jogador, hash);
-			mapa[258963][555555] = LESTE;
-			exit(0);
+			//printf("converte_hash_para_sentido: %d não é adjacente à %d\n", hash_jogador, hash);
+			finaliza("caiu no poço!");
+			return -1;
 	}
 }
 
@@ -257,17 +254,13 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 	//getchar();
 
 	if(verifica_estado(mapa, player.linha, player.coluna, RELUSENTE)){
-		//printf("Ação: PEGAR\n");
 		agir(PEGAR, -1);
 	}else if(verifica_estado(mapa, player.linha, player.coluna, POCO)){
-		//TO-DO
-		printf("Caiu no poço\n");
 		pontuar(-1000);
-		exit(0);
+		finaliza("Caiu no poço");
 	}else if(verifica_estado(mapa, player.linha, player.coluna, WUMPUS)){
-		printf("Wumpus te matou!\n");
 		pontuar(-1000);
-		exit(0);
+		finaliza("Wumpus te matou!");
 	}
 
 	marcar_estados_adj();
@@ -442,4 +435,13 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 	agir(ANDAR, sentido);
 	pai[ultimo_pai] = -1;
 	return -1;
+}
+
+void finaliza(const char *mensagem){
+	if(mensagem != NULL){
+		puts(mensagem);
+	}
+	
+	printf("Pontuação final: %d\n", player.pontos);
+	
 }
