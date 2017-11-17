@@ -208,7 +208,7 @@ SENTIDO converte_hash_para_sentido(char hash){
 		case -1:
 			return OESTE;
 		default:
-			printf("converte_hash_para_sentido: erro\n");
+			printf("converte_hash_para_sentido: %d não é adjacente à %d\n", hash_jogador, hash);
 			mapa[258963][555555] = LESTE;
 			exit(0);
 	}
@@ -263,6 +263,11 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 	}else if(verifica_estado(mapa, player.linha, player.coluna, POCO)){
 		//TO-DO
 		printf("Caiu no poço\n");
+		pontuar(-1000);
+		exit(0);
+	}else if(verifica_estado(mapa, player.linha, player.coluna, WUMPUS)){
+		printf("Wumpus te matou!\n");
+		pontuar(-1000);
 		exit(0);
 	}
 	
@@ -305,7 +310,7 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 	SENTIDO sentido;
 	//Percorre Matriz.
 	for(i = 0; i < 3; i++){
-		for(j = 0; j < TAM_MAPA; j++){
+		for(j = 0; j < TAM_MAPA && matriz_estado[i][j] != -1; j++){
 			hash_novo = matriz_estado[i][j];
 			
 			if(hash_novo == -1){
@@ -443,13 +448,18 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 				}printf("\n");
 				
 				printf("Ultimo pai[%d]: %d %d%d :: %d\n", ultimo_pai,pai[ultimo_pai],player.linha,player.coluna,hash_player);
-				sentido = converte_hash_para_sentido(pai[ultimo_pai+1]);
-				agir(ANDAR, sentido);
+				/*sentido = converte_hash_para_sentido(pai[ultimo_pai+1]);
+				agir(ANDAR, sentido);*/
 			}
 		}
 	}
 
 	//pai[ultimo_pai] = -1;
 	printf("SAFADO!!!!\n");
+	//Volta o movimento.
+
+	sentido = converte_hash_para_sentido(pai[ultimo_pai]);
+	agir(ANDAR, sentido);
+	pai[ultimo_pai] = -1;
 	return -1;
 }
