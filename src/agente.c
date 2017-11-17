@@ -8,7 +8,7 @@ void inicializa_jogador(){
 	iniciar_mapa(player.mundo_conhecido, 0);
 	mapa[TAM_MAPA - 1][0] |= (JOGADOR | VISITADO);
 	player.mundo_conhecido[TAM_MAPA - 1][0] = mapa[TAM_MAPA - 1][0] | CONHECIDO;
-	player.direcao = NORTE;
+	player.direcao = LESTE;
 	player.linha = TAM_MAPA - 1;
 	player.coluna = 0;
 	player.pontos = 0; // definindo pontuação inicial.
@@ -443,5 +443,5 @@ void finaliza(const char *mensagem){
 	}
 	
 	printf("Pontuação final: %d\n", player.pontos);
-	
+	exit(0);
 }

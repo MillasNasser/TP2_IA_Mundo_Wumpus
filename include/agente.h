@@ -6,7 +6,7 @@
 
 // define o pontuação caso o agente encontre o 
 // ouro.
-#define PREMIUM 10000
+#define PREMIUM 1000
 // define a penalidade sobre o agente caso 
 // seja atirado uma flecha.
 #define THROW_ARROW -10
