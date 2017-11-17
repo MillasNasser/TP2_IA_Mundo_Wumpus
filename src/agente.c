@@ -228,7 +228,7 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 	int retorno;
 
 	//Encontrando o último pai.
-	char ultimo_pai;
+	int ultimo_pai;
 	printf("Caminho:");
 	for(k = 0; k < TAM_MAPA * TAM_MAPA && pai[k] != -1; k++){
 		printf(" %02d", pai[k]);
