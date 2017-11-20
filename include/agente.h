@@ -3,15 +3,12 @@
 
 #include "ambiente.h"
 
-
 // define o pontuação caso o agente encontre o 
 // ouro.
 #define PREMIUM 1000
 // define a penalidade sobre o agente caso 
 // seja atirado uma flecha.
 #define THROW_ARROW -10
-// Macro para obter o módulo de uma operação.
-#define MODULO(x) ((x)>=0?(x):-(x))
 
 #define hash(linha, coluna) ((linha) * 10) + (coluna)
 
@@ -39,40 +36,39 @@ Personagem player;
 
 extern char mapa[TAM_MAPA][TAM_MAPA];
 
-/*TO-DO: Faz a movimentação do personagem
- *		 gastando pontos dependendo do movimento*/
-void agir(ACAO acao, SENTIDO direcao);
-
-/*Define a ação que o agente irá tomar*/
-int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo);
-
-int marcar_estados_adj();
-
-/*TO-DO: Altera o atributo pontos do agente. 
- * (similar a um set).*/
-void pontuar(int pontos);
-
-/*TO-DO: (Altera as "coordenadas" x e y do agente)
- * realiza a movimentação do agente e aplica penalização.*/
-void andar(SENTIDO sentido);
-
 void inicializa_jogador();
 
-/*TO-DO: Altera a direção (NORTE, SUL, LESTE e OESTE)
- * do agente e aplica penalização.*/
+///Altera o atributo pontos do agente. (similar um set).
+void pontuar(int pontos);
+
+/**
+ * Altera as "coordenadas" x e y do agente. Realiza a movimentação do agente e
+ * aplica penalização.
+ */
+void andar(SENTIDO sentido);
+
+///Altera a direção (NORTE, SUL, LESTE e OESTE) do agente e aplica penalização.
 void rotacionar(SENTIDO newSentido);
 
-/*TO-DO: Aplica pontuação final para o agente e remove 
- * ouro do mapa. (FLAG PREMIUM).*/
+///Aplica pontuação final para o agente e remove ouro do mapa. (FLAG PREMIUM).
 void pegarOuro();
 
-/*TO-DO: Remove o wumpus do mapa e aplica penalização
- * ao agente por atirar a flecha. (FLAG THROW_AXE)*/
+/**
+ * Remove o wumpus do mapa e aplica penalização ao agente por atirar a flecha.
+ * (FLAG THROW_AXE)
+ */
 void atirarFlecha(SENTIDO sentido);
 
-/*TO-DO: Identifica qual ação deve ser tomada (ROTATE, 
- * ANDAR, ATIRAR, PEGAR) e chama a função respectiva.*/
+/**
+ * Identifica qual ação deve ser tomada (ROTATE, ANDAR, ATIRAR, PEGAR) e chama a
+ * função respectiva.*/
 void agir(ACAO acao, SENTIDO sentido);
+
+///Utiliza o mundo conhecido para tentar deduzir o que existe no mapa.
+int marcar_estados_adj();
+
+///Define a ação que o agente irá tomar
+int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo);
 
 /**
  * Imprime na tela um pequeno mapa com todas as informações que o jogador
@@ -80,6 +76,10 @@ void agir(ACAO acao, SENTIDO sentido);
  */
 void imprime_mundo_conhecido();
 
+/**
+ * Exibe uma mensagem na tela e encerra o jogo mostrando a pontuação final do
+ * agente.
+ */
 void finaliza(const char *mensagem);
 
 #endif /*_AGENTE_H_*/

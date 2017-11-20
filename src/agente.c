@@ -70,8 +70,6 @@ void rotacionar(SENTIDO newSentido){
 	}
 }
 
-// Função para alterar a pontuação do agente ao pegar o ouro.
-
 void pegarOuro(){
 
 	pontuar(PREMIUM);
@@ -130,11 +128,6 @@ void agir(ACAO acao, SENTIDO sentido){
 			finaliza("Não fui programado para agir desse jeito");
 			break;
 	}
-}
-
-void imprime_mundo_conhecido(){
-	imprime_mapa(player.mundo_conhecido);
-	printf("Posicao: (%d, %d)\n", player.linha, player.coluna);
 }
 
 /*Define as respectivas suposições em relação a posição a que o agente está presente*/
@@ -435,6 +428,11 @@ int gera_acao(char pai[TAM_MAPA * TAM_MAPA], int ultimo){
 	agir(ANDAR, sentido);
 	pai[ultimo_pai] = -1;
 	return -1;
+}
+
+void imprime_mundo_conhecido(){
+	imprime_mapa(player.mundo_conhecido);
+	printf("Posicao: (%d, %d)\n", player.linha, player.coluna);
 }
 
 void finaliza(const char *mensagem){

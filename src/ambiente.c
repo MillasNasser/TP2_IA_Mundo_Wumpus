@@ -9,6 +9,82 @@ void iniciar_mapa(char mapa[TAM_MAPA][TAM_MAPA], char valor){
 	}
 }
 
+void gerar_mapa(char *nome_arquivo){
+	char mapa_arquivo[TAM_MAPA][TAM_MAPA];
+	iniciar_mapa(mapa_arquivo, '-');
+
+	//Escolhendo a posição inicial do jogador.
+	int jogador_linha = TAM_MAPA - 1, jogador_coluna = 0;
+	mapa_arquivo[jogador_linha][jogador_coluna] = 'J';
+
+	//Gerando a posicao do ouro;
+	int ouro_linha, ouro_coluna;
+	do{
+		ouro_linha = rand() % 4;
+		ouro_coluna = rand() % 4;
+	}while(mapa_arquivo[ouro_linha][ouro_coluna] != '-' || !verificar_redor_inicial_jogador(ouro_linha, ouro_coluna));
+	mapa_arquivo[ouro_linha][ouro_coluna] = 'R';
+
+	//Gerando as posições dos poços. Sempre serão gerados 3 poços.
+	int pocos_validos = 0;
+	while(!pocos_validos){
+		int posicoes[3][2];
+		int valido = 0;
+		int i;
+		for(i = 0; i < 3; i++){
+			while(!valido){
+				posicoes[i][0] = rand() % 4;
+				posicoes[i][1] = rand() % 4;
+				int pos0 = posicoes[i][0], pos1 = posicoes[i][1];
+				if(mapa_arquivo[pos0][pos1] == '-' && verificar_redor_inicial_jogador(pos0, pos1)){
+					mapa_arquivo[pos0][pos1] = 'P';
+					valido = 1;
+				}
+			}
+			valido = 0;
+		}
+
+		if(verificar_solucao_possivel_mapa(ouro_linha, ouro_coluna, mapa_arquivo)){
+			pocos_validos = 1;
+		}else{
+			mapa_arquivo[posicoes[0][0]][posicoes[0][1]] = '-';
+			mapa_arquivo[posicoes[1][0]][posicoes[1][1]] = '-';
+			mapa_arquivo[posicoes[2][0]][posicoes[2][1]] = '-';
+		}
+	}
+
+	//Gerando posição do Wumpus.
+	int wumpus_linha, wumpus_coluna;
+	do{
+		wumpus_linha = rand() % 4;
+		wumpus_coluna = rand() % 4;
+	}while((mapa_arquivo[wumpus_linha][wumpus_coluna] != '-' && mapa_arquivo[wumpus_linha][wumpus_coluna] != 'P') ||
+		!verificar_redor_inicial_jogador(wumpus_linha, wumpus_coluna));
+	if(mapa_arquivo[wumpus_linha][wumpus_coluna] == 'P'){
+		mapa_arquivo[wumpus_linha][wumpus_coluna] = 'D';
+	}else{
+		mapa_arquivo[wumpus_linha][wumpus_coluna] = 'W';
+	}
+
+	criar_arquivo(nome_arquivo, mapa_arquivo);
+	carregar_mapa(nome_arquivo, mapa_arquivo, 0);
+}
+
+void criar_arquivo(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA]){
+	FILE *arquivo = fopen(nome_arquivo, "w");
+	int i, j;
+	for(i = 0; i < TAM_MAPA; i++){
+		for(j = 0; j < TAM_MAPA; j++){
+			fprintf(arquivo, "%c", matriz[i][j]);
+			if(j < TAM_MAPA - 1){
+				fprintf(arquivo, " ");
+			}
+		}
+		fprintf(arquivo, "\n");
+	}
+	fclose(arquivo);
+}
+
 void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag){
 	iniciar_mapa(mapa, 0);
 	FILE *arquivo;
@@ -111,65 +187,10 @@ void carregar_mapa(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA], int flag
 		fclose(arquivo);
 }
 
-void gerar_mapa(char *nome_arquivo){
-	char mapa_arquivo[TAM_MAPA][TAM_MAPA];
-	iniciar_mapa(mapa_arquivo, '-');
-
-	//Escolhendo a posição inicial do jogador.
-	int jogador_linha = TAM_MAPA - 1, jogador_coluna = 0;
-	mapa_arquivo[jogador_linha][jogador_coluna] = 'J';
-
-	//Gerando a posicao do ouro;
-	int ouro_linha, ouro_coluna;
-	do{
-		ouro_linha = rand() % 4;
-		ouro_coluna = rand() % 4;
-	}while(mapa_arquivo[ouro_linha][ouro_coluna] != '-' || !verificar_redor_inicial_jogador(ouro_linha, ouro_coluna));
-	mapa_arquivo[ouro_linha][ouro_coluna] = 'R';
-
-	//Gerando as posições dos poços. Sempre serão gerados 3 poços.
-	int pocos_validos = 0;
-	while(!pocos_validos){
-		int posicoes[3][2];
-		int valido = 0;
-		int i;
-		for(i = 0; i < 3; i++){
-			while(!valido){
-				posicoes[i][0] = rand() % 4;
-				posicoes[i][1] = rand() % 4;
-				int pos0 = posicoes[i][0], pos1 = posicoes[i][1];
-				if(mapa_arquivo[pos0][pos1] == '-' && verificar_redor_inicial_jogador(pos0, pos1)){
-					mapa_arquivo[pos0][pos1] = 'P';
-					valido = 1;
-				}
-			}
-			valido = 0;
-		}
-
-		if(verificar_solucao_possivel_mapa(ouro_linha, ouro_coluna, mapa_arquivo)){
-			pocos_validos = 1;
-		}else{
-			mapa_arquivo[posicoes[0][0]][posicoes[0][1]] = '-';
-			mapa_arquivo[posicoes[1][0]][posicoes[1][1]] = '-';
-			mapa_arquivo[posicoes[2][0]][posicoes[2][1]] = '-';
-		}
-	}
-
-	//Gerando posição do Wumpus.
-	int wumpus_linha, wumpus_coluna;
-	do{
-		wumpus_linha = rand() % 4;
-		wumpus_coluna = rand() % 4;
-	}while((mapa_arquivo[wumpus_linha][wumpus_coluna] != '-' && mapa_arquivo[wumpus_linha][wumpus_coluna] != 'P') ||
-		!verificar_redor_inicial_jogador(wumpus_linha, wumpus_coluna));
-	if(mapa_arquivo[wumpus_linha][wumpus_coluna] == 'P'){
-		mapa_arquivo[wumpus_linha][wumpus_coluna] = 'D';
-	}else{
-		mapa_arquivo[wumpus_linha][wumpus_coluna] = 'W';
-	}
-
-	criar_arquivo(nome_arquivo, mapa_arquivo);
-	carregar_mapa(nome_arquivo, mapa_arquivo, 0);
+int verificar_redor_inicial_jogador(int linha, int coluna){
+	if((linha == TAM_MAPA - 2 && coluna == 0) || (linha == TAM_MAPA - 1 && coluna == 1) || (linha == TAM_MAPA - 2 && coluna == 1))
+		return 0;
+	return 1;
 }
 
 int verificar_solucao_possivel_mapa(int linha, int coluna, char matriz[TAM_MAPA][TAM_MAPA]){
@@ -230,32 +251,37 @@ int verificar_solucao_possivel_mapa(int linha, int coluna, char matriz[TAM_MAPA]
 	return 1;
 }
 
-int verificar_redor_inicial_jogador(int linha, int coluna){
-	if((linha == TAM_MAPA - 2 && coluna == 0) || (linha == TAM_MAPA - 1 && coluna == 1) || (linha == TAM_MAPA - 2 && coluna == 1))
-		return 0;
-	return 1;
-}
-
-void criar_arquivo(char *nome_arquivo, char matriz[TAM_MAPA][TAM_MAPA]){
-	FILE *arquivo = fopen(nome_arquivo, "w");
-	int i, j;
-	for(i = 0; i < TAM_MAPA; i++){
-		for(j = 0; j < TAM_MAPA; j++){
-			fprintf(arquivo, "%c", matriz[i][j]);
-			if(j < TAM_MAPA - 1){
-				fprintf(arquivo, " ");
-			}
-		}
-		fprintf(arquivo, "\n");
-	}
-	fclose(arquivo);
-}
-
 int verifica_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado){
 	if(coluna >= 0 && coluna < 4 && linha >= 0 && linha < 4){
 		return((mapa[linha][coluna] & (estado)) == estado);
 	}
 	return 0;
+}
+
+void adicionar_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado, ESTADO condicao){
+	if(linha >=0 && linha < TAM_MAPA && coluna >= 0 && coluna < TAM_MAPA && !verifica_estado(mapa, linha, coluna, condicao)){
+		mapa[linha][coluna] |= estado;
+	}
+}
+
+void remover_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado){
+	if(linha >=0 && linha < TAM_MAPA && coluna >= 0 && coluna < TAM_MAPA){
+		mapa[linha][coluna] &= ~estado;
+	}
+}
+
+void adicionar_estados_adjacentes(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado, ESTADO condicao){
+	adicionar_estado(mapa, linha-1, coluna, estado, condicao);
+	adicionar_estado(mapa, linha+1, coluna, estado, condicao);
+	adicionar_estado(mapa, linha, coluna-1, estado, condicao);
+	adicionar_estado(mapa, linha, coluna+1, estado, condicao);
+}
+
+void remover_estados_adjacentes(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado){
+	remover_estado(mapa, linha-1, coluna, estado);
+	remover_estado(mapa, linha+1, coluna, estado);
+	remover_estado(mapa, linha, coluna-1, estado);
+	remover_estado(mapa, linha, coluna+1, estado);
 }
 
 void __imprime_mapa_linha(char hor, char vert, int x){
@@ -307,30 +333,4 @@ void imprime_mapa(char mapa[TAM_MAPA][TAM_MAPA]){
 		printf(" ");
 		__imprime_mapa_linha(hor, vert, x);
 	}
-}
-
-void adicionar_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado, ESTADO condicao){
-	if(linha >=0 && linha < TAM_MAPA && coluna >= 0 && coluna < TAM_MAPA && !verifica_estado(mapa, linha, coluna, condicao)){
-		mapa[linha][coluna] |= estado;
-	}
-}
-
-void remover_estado(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado){
-	if(linha >=0 && linha < TAM_MAPA && coluna >= 0 && coluna < TAM_MAPA){
-		mapa[linha][coluna] &= ~estado;
-	}
-}
-
-void adicionar_estados_adjacentes(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado, ESTADO condicao){
-	adicionar_estado(mapa, linha-1, coluna, estado, condicao);
-	adicionar_estado(mapa, linha+1, coluna, estado, condicao);
-	adicionar_estado(mapa, linha, coluna-1, estado, condicao);
-	adicionar_estado(mapa, linha, coluna+1, estado, condicao);
-}
-
-void remover_estados_adjacentes(char mapa[TAM_MAPA][TAM_MAPA], int linha, int coluna, ESTADO estado){
-	remover_estado(mapa, linha-1, coluna, estado);
-	remover_estado(mapa, linha+1, coluna, estado);
-	remover_estado(mapa, linha, coluna-1, estado);
-	remover_estado(mapa, linha, coluna+1, estado);
 }
