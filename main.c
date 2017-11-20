@@ -13,6 +13,9 @@ int main(int argc,char **argv){
 	}		
 	inicializa_jogador();
 	
+	imprime_mapa(mapa);
+	imprime_mundo_conhecido();
+	
 	char pai[TAM_MAPA * TAM_MAPA];
 	int i;
 	for(i=0; i<TAM_MAPA * TAM_MAPA; i++){
