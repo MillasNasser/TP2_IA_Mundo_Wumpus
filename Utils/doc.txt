@@ -1,0 +1,22 @@
+A função recebe dois parâmentros: Uma lista de posições já visitadas no estado atual da recursão e uma variável booleana indicando se a execução corrente pode tomar ações drásticas, i.e., atirar uma flecha ou andar em direção a um poço.
+
+O primeiro passo é verificar o que existe na posição atual do agente. Se for um poço ou wumpus, então o jogo é encerrado. Se for ouro, então a ação AGARRAR é enviada e o jogo também termina.
+
+Se nenhum dos três estados estiver na posição do agente, então ele verifica o mundo conhecido para inferir onde está o wumpus e os poços.
+
+Após isso, as três listas são preenchidas usando as posições adjacentes ao agente.
+
+Enquanto houver alguma listão não-vazia:
+Se existe uma posição livre na lista, então o agente se moverá para ela.
+Caso contrário, se a lista de wumpus não estiver vazia, a função tem dois caminhos:
+	Se a variável ultimo recebida por parâmetro for verdadeira, então o agente irá atirar no wumpus ou se moverá em direção a ele.
+	Se ultimo for falsa, então o agente voltará para a posição anterior e retornará para a função que a chamou que encontrou um wumpus no caminho.
+Por fim, se a lista de wumpus também estiver vazia, então a função também tem dois caminhos:
+	Se a variável ultimo recebida por parâmetro for verdadeira, então o agente escolherá um poço da lista aleatoriamente e se moverá em direção a ele.
+	Se ultimo for false, então o agente voltará para a posição anterior e retornará para a função que a chamou que encontrou um poço no caminho.
+
+
+Após a ação tomada, e recursão é chamada. Caso o agente tenha andado, ele se insere na lista de posições visitadas. O valor da variável ultmio depende dos seguintes fatores:
+Se a função recebeu ultimo como falso, então ela somente poderá passar falso adiante. Se ela recebeu ultimo como verdadeiro, então ela passará ultimo como verdadeiro caso exista apenas uma posição livre e a lista de wumpus esteja vazia.
+
+O retorno da chamada recursiva é então analisado. Se retornar que encontrou um wumpus, então essa posição é adicionada na lista de wumpus. Se retornar que encontrou um poço, então essa posição é adicionada na lista de poço.

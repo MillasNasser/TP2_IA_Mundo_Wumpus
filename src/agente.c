@@ -381,12 +381,12 @@ void imprime_mundo_conhecido(){
 }
 
 void finaliza(const char *mensagem){
+	imprime_mapa(mapa);
+	imprime_mundo_conhecido();
+	
 	if(mensagem != NULL){
 		puts(mensagem);
 	}
-	
-	imprime_mapa(mapa);
-	imprime_mundo_conhecido();
 	
 	printf("Pontuação final: %d\n", player.pontos);
 	exit(0);
